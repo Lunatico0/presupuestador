@@ -47,17 +47,16 @@ const SearchableProducts = () => {
   };
 
   const handleCantidadChange = (id, value) => {
-    const cantidad = parseInt(value, 10);
     setQuantities((prevQuantities) => ({
       ...prevQuantities,
-      [id]: isNaN(cantidad) || cantidad < 1 ? 1 : cantidad,
+      [id]: value === "" || isNaN(value) ? "" : value,
     }));
   };
 
   const handleCantidadBlur = (id) => {
     setQuantities((prevQuantities) => ({
       ...prevQuantities,
-      [id]: prevQuantities[id] === "" || prevQuantities[id] < 1 ? 1 : prevQuantities[id],
+      [id]: prevQuantities[id] === "" || isNaN(prevQuantities[id]) || prevQuantities[id] < 1 ? 1 : prevQuantities[id],
     }));
   };
 
@@ -151,9 +150,8 @@ const SearchableProducts = () => {
                 <p className="mt-1 font-bold">${product.price.toFixed(2)}</p>
                 <div className="flex flex-row w-full gap-4">
                   <input
-                    type="number"
+                    type="text"
                     className="w-1/3 focus:outline-none"
-                    min={1}
                     value={quantities[product._id] || ""}
                     onChange={(e) => handleCantidadChange(product._id, e.target.value)}
                     onBlur={() => handleCantidadBlur(product._id)}
