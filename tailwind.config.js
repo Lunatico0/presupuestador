@@ -1,0 +1,25 @@
+/** @type {import('tailwindcss').Config} */
+export default {
+  mode: 'jit',
+  darkMode: 'class',
+  content: [
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {
+      fontFamily:{
+        "titleFont": "'Josefin Sans', sans-serif",
+      },
+      colors: {
+        "logo": '#cda151',
+        "primary": '#a19d9d',
+        "textDark": '#100e10',
+        "textLight": '#fcfcfc',
+        "light": '#fcfcfc',
+        "dark": '#333333',
+        "secondary": '#4a4a4a'
+      },
+    },
+  },
+  plugins: [require('@tailwindcss/line-clamp')],
+}
