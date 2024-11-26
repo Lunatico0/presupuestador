@@ -77,6 +77,7 @@ const Presupuesto = () => {
                 </div>
 
                 <div className="flex flex-col items-center gap-2 lg:gap-4 lg:flex-row lg:justify-end">
+                  <label htmlFor="cantidad" className='self-center'>Cant:</label>
                   <input
                     type="number"
                     className="w-full lg:w-20 h-10 px-2 border border-gray-300 rounded focus:outline-none"

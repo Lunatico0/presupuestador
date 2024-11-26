@@ -149,6 +149,7 @@ const SearchableProducts = () => {
                 ))}
                 <p className="mt-1 font-bold">${product.price.toFixed(2)}</p>
                 <div className="flex flex-row w-full gap-4">
+                  <label htmlFor="cantidad" className='self-center'>Cant:</label>
                   <input
                     type="text"
                     className="w-1/3 focus:outline-none"
@@ -157,7 +158,7 @@ const SearchableProducts = () => {
                     onBlur={() => handleCantidadBlur(product._id)}
                   />
                   <button
-                    className="bg-green-600/80 px-4 py-2 rounded-md justify-self-end w-2/3"
+                    className="bg-green-600/80 px-4 py-2 rounded-md justify-self-end w-2/3 text-nowrap"
                     onClick={() => agregarProducto(product._id)}
                   >
                     Agregar al presupuesto
