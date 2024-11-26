@@ -1,7 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useProducts } from '../context/productContext.jsx';
 import { useCart } from '../context/cartContext.jsx';
-import Presupuesto from './presupuesto.jsx';
 
 const SearchableProducts = () => {
   const { products, loading, error } = useProducts();
@@ -10,6 +9,16 @@ const SearchableProducts = () => {
   const [quantities, setQuantities] = useState({});
   const [isSuggestionsVisible, setIsSuggestionsVisible] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
+
+  useEffect(() => {
+    if (products.length > 0) {
+      const initialQuantities = products.reduce((acc, product) => {
+        acc[product._id] = 1; // Inicializar todos los productos con cantidad 1
+        return acc;
+      }, {});
+      setQuantities(initialQuantities);
+    }
+  }, [products]);
 
   const normalizeText = (text) =>
     text
@@ -30,17 +39,24 @@ const SearchableProducts = () => {
   }, [products, search]);
 
   const agregarProducto = (id) => {
-    const cantidad = quantities[id] || 1; // Usar la cantidad del input o 1 por defecto
+    const cantidad = quantities[id] || 1;
     setCart((prevCart) => ({
       ...prevCart,
-      [id]: (prevCart[id] || 0) + cantidad, // Sumar la cantidad al carrito
+      [id]: (prevCart[id] || 0) + cantidad,
     }));
   };
 
   const handleCantidadChange = (id, value) => {
     setQuantities((prevQuantities) => ({
       ...prevQuantities,
-      [id]: Math.max(1, Number(value)), // Asegurar que la cantidad mínima sea 1
+      [id]: value,
+    }));
+  };
+
+  const handleCantidadBlur = (id) => {
+    setQuantities((prevQuantities) => ({
+      ...prevQuantities,
+      [id]: prevQuantities[id] === "" || prevQuantities[id] < 1 ? 1 : prevQuantities[id],
     }));
   };
 
@@ -135,15 +151,11 @@ const SearchableProducts = () => {
                 <div className="flex flex-row w-full gap-4">
                   <input
                     type="number"
-                    style={{
-                      appearance: 'none',
-                      WebkitAppearance: 'none',
-                      MozAppearance: 'textfield',
-                    }}
                     className="w-1/3 focus:outline-none"
                     min={1}
-                    value={quantities[product._id] || 1}
+                    value={quantities[product._id] || ""}
                     onChange={(e) => handleCantidadChange(product._id, e.target.value)}
+                    onBlur={() => handleCantidadBlur(product._id)}
                   />
                   <button
                     className="bg-green-600/80 px-4 py-2 rounded-md justify-self-end w-2/3"

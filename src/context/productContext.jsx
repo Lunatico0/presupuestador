@@ -6,8 +6,8 @@ export const ProductsProvider = ({ children }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [productDetails, setProductDetails] = useState({}); // Almacenar detalles de productos
-  const [fetchedIds, setFetchedIds] = useState(new Set()); // Mantener registro de los productos ya solicitados
+  const [productDetails, setProductDetails] = useState({});
+  const [fetchedIds, setFetchedIds] = useState(new Set());
 
   const fetchProductById = async (id) => {
     if (!fetchedIds.has(id)) { // Verifica si ya se ha solicitado este producto
