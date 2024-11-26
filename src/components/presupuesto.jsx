@@ -19,17 +19,10 @@ const Presupuesto = () => {
 
   const handleCantidadChange = (id, value) => {
     const cantidad = parseInt(value, 10);
-    if (isNaN(cantidad) || cantidad < 1) {
-      setCart((prevCart) => ({
-        ...prevCart,
-        [id]: "",
-      }));
-    } else {
-      setCart((prevCart) => ({
-        ...prevCart,
-        [id]: cantidad,
-      }));
-    }
+    setCart((prevCart) => ({
+      ...prevCart,
+      [id]: isNaN(cantidad) || cantidad < 1 ? "" : cantidad,
+    }));
   };
 
   const handleBlur = (id) => {

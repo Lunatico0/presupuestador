@@ -39,17 +39,18 @@ const SearchableProducts = () => {
   }, [products, search]);
 
   const agregarProducto = (id) => {
-    const cantidad = quantities[id] || 1;
+    const cantidad = parseInt(quantities[id] || 1, 10);
     setCart((prevCart) => ({
       ...prevCart,
-      [id]: (prevCart[id] || 0) + cantidad,
+      [id]: (parseInt(prevCart[id] || 0, 10) + cantidad),
     }));
   };
 
   const handleCantidadChange = (id, value) => {
+    const cantidad = parseInt(value, 10);
     setQuantities((prevQuantities) => ({
       ...prevQuantities,
-      [id]: value,
+      [id]: isNaN(cantidad) || cantidad < 1 ? 1 : cantidad,
     }));
   };
 
