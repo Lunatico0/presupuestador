@@ -29,13 +29,21 @@
   }
 }
 
-input[type="number"]::-webkit-inner-spin-button,
+input[type="text"]::-webkit-inner-spin-button,
+input[type="text"]::-webkit-outer-spin-button input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
+input[type="text"],
 input[type="number"] {
-  -moz-appearance: textfield;
   appearance: none;
+  -moz-appearance: textfield;
+}
+
+input {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
 }

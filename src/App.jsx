@@ -1,4 +1,5 @@
 import './App.css'
+import './index.css'
 import React from 'react';
 import { ProductsProvider } from './context/productContext.jsx';
 import SearchableProducts from './components/SearchableProducts.jsx';
