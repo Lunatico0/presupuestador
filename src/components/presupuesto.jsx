@@ -96,15 +96,15 @@ const Presupuesto = () => {
                 />
 
                 <div className="flex flex-col gap-2 lg:flex-1">
-                  <h2 className="text-lg font-semibold text-center lg:text-left">
+                  <h2 className="text-lg font-semibold text-left">
                     {productDetails[id]?.product.title}
                   </h2>
-                  <p className="line-clamp-2 text-sm text-gray-400 text-center lg:text-left">
+                  <p className="line-clamp-2 text-sm text-gray-400 text-left">
                     {
                       productDetails[id]?.product.description.filter((desc) =>
                         desc.label === 'MEDIDAS' ||
                         desc.label === 'COMPOSICIÓN' ||
-                        desc.label === 'CANT. DE PIEZAS POR CAJA'||
+                        desc.label === 'CANT. DE PIEZAS POR CAJA' ||
                         desc.label === 'PRESENTACIÓN'
                       ).map((desc) => (
                         <span key={desc.label}>
@@ -113,15 +113,15 @@ const Presupuesto = () => {
                       ))
                     }
                   </p>
-                  <p className="text-md font-medium text-center lg:text-left">
+                  <p className="text-md font-medium text-left">
                     Precio: ${productDetails[id]?.product.price.toFixed(2)}
                   </p>
-                  <p className="text-md font-medium text-center lg:text-left">
+                  <p className="text-md font-medium text-left">
                     Subtotal: ${(cart[id] * productDetails[id]?.product.price).toFixed(2)}
                   </p>
                   {/* Muestra el precio con ganancia si está configurado */}
                   {ganancia[id] !== undefined && (
-                    <p className="text-md font-medium text-center lg:text-left">
+                    <p className="text-md font-medium text-left">
                       Precio con ganancia: $
                       {(
                         (cart[id] * productDetails[id]?.product.price) *
@@ -132,29 +132,33 @@ const Presupuesto = () => {
                 </div>
 
                 <div className="flex flex-col items-center gap-2 lg:gap-4 lg:flex-row lg:justify-end">
-                  <label htmlFor="cantidad" className='self-center'>Cant:</label>
-                  <input
-                    style={{
-                      MozAppearance: "textfield"
-                    }}
-                    type="number"
-                    className="w-full lg:w-20 h-10 px-2 border border-gray-300 rounded focus:outline-none"
-                    min={1}
-                    value={cart[id] || ""}
-                    onChange={(e) => handleCantidadChange(id, e.target.value)}
-                    onBlur={() => handleBlur(id)}
-                  />
-                  <label htmlFor={`ganancia-${id}`} className="self-center">Ganancia:</label>
-                  <input
-                    type="number"
-                    className="w-full lg:w-20 h-10 px-2 border border-gray-300 rounded focus:outline-none"
-                    id={`ganancia-${id}`}
-                    min={0}
-                    max={100}
-                    value={ganancia[id] === undefined ? "" : ganancia[id]}
-                    onChange={(e) => handleGananciaChange(id, e.target.value)}
-                  />
-                  <label htmlFor={`ganancia-${id + 1}`} className="self-center"> %</label>
+                  <div className='flex flex-row gap-4 justify-between w-5/6'>
+                    <label htmlFor="cantidad" className='self-center'>Cant:</label>
+                    <input
+                      style={{
+                        MozAppearance: "textfield"
+                      }}
+                      type="number"
+                      className="w-full lg:w-20 h-10 px-2 border border-gray-300 rounded focus:outline-none"
+                      min={1}
+                      value={cart[id] || ""}
+                      onChange={(e) => handleCantidadChange(id, e.target.value)}
+                      onBlur={() => handleBlur(id)}
+                    />
+                  </div>
+                  <div className='flex flex-row gap-4 justify-between w-full'>
+                    <label htmlFor={`ganancia-${id}`} className="self-center">Ganancia:</label>
+                    <input
+                      type="number"
+                      className="w-full lg:w-20 h-10 px-2 border border-gray-300 rounded focus:outline-none"
+                      id={`ganancia-${id}`}
+                      min={0}
+                      max={100}
+                      value={ganancia[id] === undefined ? "" : ganancia[id]}
+                      onChange={(e) => handleGananciaChange(id, e.target.value)}
+                    />
+                    <label htmlFor={`ganancia-${id + 1}`} className="self-center"> %</label>
+                  </div>
                   <button
                     className="bg-red-600 text-white px-4 py-2 rounded-md"
                     onClick={() => handleRemoveProduct(id)}
