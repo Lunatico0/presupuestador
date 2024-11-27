@@ -66,11 +66,6 @@ const SearchableProducts = () => {
     setSelectedIndex(-1);
   };
 
-  const handleSuggestionClick = (product) => {
-    setSearch(product.title);
-    setIsSuggestionsVisible(false);
-  };
-
   const handleKeyDown = (event) => {
     if (event.key === 'ArrowDown') {
       setSelectedIndex((prevIndex) => Math.min(predictions.length - 1, prevIndex + 1));

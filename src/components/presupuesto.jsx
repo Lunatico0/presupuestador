@@ -76,13 +76,29 @@ const Presupuesto = () => {
     });
   };
 
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const calculateSubtotalWithoutIVA = () =>
+    Object.keys(cart).reduce((acc, id) => {
+      const price = productDetails[id]?.product.price;
+      const cantidad = cart[id];
+      const gananciaPorcentaje = ganancia[id] || 0;
+      const precioConGanancia = price + (price * gananciaPorcentaje) / 100; // Precio con ganancia
+      return acc + cantidad * precioConGanancia;
+    }, 0);
+
+  const calculateIVA = () => calculateSubtotalWithoutIVA() * 0.21;
+  const calculateTotal = () => calculateSubtotalWithoutIVA() + calculateIVA();
+
   return (
-    <div>
+    <div className='w-full'>
       {
         Object.keys(cart).length <= 0 ? (
           <p>No hay productos en el carrito</p>
-        ) : <>
-          <h2 className="text-xl font-bold mb-4 text-center">Presupuesto</h2>
+        ) : <div id="printable-content">
+          <h2 className="text-xl font-bold mb-4 text-center">Presupuesto Artemisa</h2>
           <div className="grid gap-4">
             {Object.keys(cart).map((id) => (
               <div
@@ -114,21 +130,11 @@ const Presupuesto = () => {
                     }
                   </p>
                   <p className="text-md font-medium text-left">
-                    Precio: ${productDetails[id]?.product.price.toFixed(2)}
+                    Precio: ${(productDetails[id]?.product.price * (1 + ganancia[id] / 100)).toFixed(2)} <span className='print:hidden pl-1'>(Con ganancia incluida)</span>
                   </p>
                   <p className="text-md font-medium text-left">
-                    Subtotal: ${(cart[id] * productDetails[id]?.product.price).toFixed(2)}
+                    Subtotal: ${((cart[id] * productDetails[id]?.product.price) * (1 + ganancia[id] / 100)).toFixed(2)} <span className='print:hidden pl-1'>(Con ganancia incluida)</span>
                   </p>
-                  {/* Muestra el precio con ganancia si está configurado */}
-                  {ganancia[id] !== undefined && (
-                    <p className="text-md font-medium text-left">
-                      Precio con ganancia: $
-                      {(
-                        (cart[id] * productDetails[id]?.product.price) *
-                        (1 + ganancia[id] / 100)
-                      ).toFixed(2)}
-                    </p>
-                  )}
                 </div>
 
                 <div className="flex flex-col items-center gap-2 lg:gap-4 lg:flex-row lg:justify-end">
@@ -139,18 +145,18 @@ const Presupuesto = () => {
                         MozAppearance: "textfield"
                       }}
                       type="number"
-                      className="w-full lg:w-20 h-10 px-2 border border-gray-300 rounded focus:outline-none"
+                      className="w-full lg:w-20 h-10 px-2 border-none border-gray-300 rounded focus:outline-none"
                       min={1}
                       value={cart[id] || ""}
                       onChange={(e) => handleCantidadChange(id, e.target.value)}
                       onBlur={() => handleBlur(id)}
                     />
                   </div>
-                  <div className='flex flex-row gap-4 justify-between w-full'>
+                  <div className='flex flex-row gap-4 justify-between w-full print:hidden'>
                     <label htmlFor={`ganancia-${id}`} className="self-center">Ganancia:</label>
                     <input
                       type="number"
-                      className="w-full lg:w-20 h-10 px-2 border border-gray-300 rounded focus:outline-none"
+                      className="w-full lg:w-20 h-10 px-2 border-none border-gray-300 rounded focus:outline-none"
                       id={`ganancia-${id}`}
                       min={0}
                       max={100}
@@ -160,7 +166,7 @@ const Presupuesto = () => {
                     <label htmlFor={`ganancia-${id + 1}`} className="self-center"> %</label>
                   </div>
                   <button
-                    className="bg-red-600 text-white px-4 py-2 rounded-md"
+                    className="bg-red-600 text-white px-4 py-2 rounded-md print:hidden"
                     onClick={() => handleRemoveProduct(id)}
                   >
                     Eliminar
@@ -169,7 +175,20 @@ const Presupuesto = () => {
               </div>
             ))}
           </div>
-        </>
+          <div className='flex flex-row-reverse'>
+            <div className="text-lg font-medium mb-12 w-1/2 text-right ml-auto">
+              <div className='flex flex-row justify-between'><p>Subtotal: </p><span>${calculateSubtotalWithoutIVA().toFixed(2)}</span></div>
+              <div className='flex flex-row justify-between'><p>IVA: </p><span>${calculateIVA().toFixed(2)}</span></div>
+              <div className='flex flex-row justify-between'><p className="font-bold">Total: </p><span>${calculateTotal().toFixed(2)}</span></div>
+            </div>
+            <button
+              onClick={handlePrint}
+              className="bg-blue-600 px-4 py-2 h-fit mt-4 text-white rounded-md print:hidden"
+            >
+              Imprimir Presupuesto
+            </button>
+          </div>
+        </div>
       }
     </div>
   );
