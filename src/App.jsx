@@ -13,7 +13,7 @@ function App() {
     <CartProvider>
       <ProductsProvider>
         <Router>
-          <div className='flex flex-col justify-center max-w-7xl px-6 md:px-16 lg:px-24 mx-auto w-full'>
+          <div className='print:w-full print:h-auto flex flex-col justify-center max-w-7xl px-6 sm:px-16 md:px-24 mx-auto w-full'>
             <header className='w-full my-6 flex flex-row justify-between print:hidden'>
               <Link to="/">
                 <h1 className='text-3xl md:text-6xl font-bold pb-4'>Todos los productos</h1>

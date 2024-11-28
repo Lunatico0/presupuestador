@@ -103,19 +103,19 @@ const Presupuesto = () => {
             {Object.keys(cart).map((id) => (
               <div
                 key={id}
-                className="rounded-lg shadow p-4 bg-secondary/40 flex flex-col lg:flex-row lg:items-center lg:gap-6"
+                className="rounded-lg shadow p-4 bg-secondary/40 flex flex-col md:flex-row md:items-center md:gap-6 print:flex-row print:items-center print:gap-6 print:rounded-none"
               >
                 <img
+                  className="w-full h-40 object-cover rounded-lg lg:w-36 lg:h-36 aspect-square md:w-fit print:w-fit"
                   src={productDetails[id]?.product.thumbnails[0]}
                   alt={productDetails[id]?.product.title}
-                  className="w-full h-40 object-cover rounded-lg lg:w-36 lg:h-36"
                 />
 
                 <div className="flex flex-col gap-2 lg:flex-1">
                   <h2 className="text-lg font-semibold text-left">
                     {productDetails[id]?.product.title}
                   </h2>
-                  <p className="line-clamp-2 text-sm text-gray-400 text-left">
+                  <p className="line-clamp-2 print:line-clamp-4 text-sm text-gray-400 text-left">
                     {
                       productDetails[id]?.product.description.filter((desc) =>
                         desc.label === 'MEDIDAS' ||
@@ -129,42 +129,61 @@ const Presupuesto = () => {
                       ))
                     }
                   </p>
-                  <p className="text-md font-medium text-left">
-                    Precio: ${(productDetails[id]?.product.price * (1 + ganancia[id] / 100)).toFixed(2)} <span className='print:hidden pl-1'>(Con ganancia incluida)</span>
-                  </p>
-                  <p className="text-md font-medium text-left">
-                    Subtotal: ${((cart[id] * productDetails[id]?.product.price) * (1 + ganancia[id] / 100)).toFixed(2)} <span className='print:hidden pl-1'>(Con ganancia incluida)</span>
-                  </p>
-                </div>
-
-                <div className="flex flex-col items-center gap-2 lg:gap-4 lg:flex-row lg:justify-end">
-                  <div className='flex flex-row gap-4 justify-between w-5/6'>
-                    <label htmlFor="cantidad" className='self-center'>Cant:</label>
+                  <div className="print:flex w-fit flex-row -mb-4 justify-between hidden">
+                    <label htmlFor="cantidad" className="self-center">Cant:</label>
                     <input
                       style={{
                         MozAppearance: "textfield"
                       }}
                       type="number"
-                      className="w-full lg:w-20 h-10 px-2 border-none border-gray-300 rounded focus:outline-none"
+                      className="w-20 h-10 px-2 border-none border-gray-300 rounded focus:outline-none"
                       min={1}
                       value={cart[id] || ""}
                       onChange={(e) => handleCantidadChange(id, e.target.value)}
                       onBlur={() => handleBlur(id)}
                     />
                   </div>
-                  <div className='flex flex-row gap-4 justify-between w-full print:hidden'>
-                    <label htmlFor={`ganancia-${id}`} className="self-center">Ganancia:</label>
+                  <p className="text-md font-medium text-left">
+                    Precio: ${(productDetails[id]?.product.price * (1 + ganancia[id] / 100)).toFixed(2)} <span className='print:hidden pl-1'>(Con ganancia incluida)</span>
+                  </p>
+                  <p className="text-md font-medium text-left print:hidden">
+                    Subtotal: ${((cart[id] * productDetails[id]?.product.price) * (1 + ganancia[id] / 100)).toFixed(2)} <span className='print:hidden pl-1'>(Con ganancia incluida)</span>
+                  </p>
+                </div>
+
+                <div className="flex flex-col items-center gap-2 md:items-end md:justify-end">
+                  <div className="flex flex-row gap-4 justify-between print:hidden">
+                    <label htmlFor="cantidad" className="self-center">Cant:</label>
                     <input
+                      style={{
+                        MozAppearance: "textfield"
+                      }}
                       type="number"
-                      className="w-full lg:w-20 h-10 px-2 border-none border-gray-300 rounded focus:outline-none"
-                      id={`ganancia-${id}`}
-                      min={0}
-                      max={100}
-                      value={ganancia[id] === undefined ? "" : ganancia[id]}
-                      onChange={(e) => handleGananciaChange(id, e.target.value)}
+                      className="w-20 lg:w-20 h-10 px-2 border-none border-gray-300 rounded focus:outline-none"
+                      min={1}
+                      value={cart[id] || ""}
+                      onChange={(e) => handleCantidadChange(id, e.target.value)}
+                      onBlur={() => handleBlur(id)}
                     />
-                    <label htmlFor={`ganancia-${id + 1}`} className="self-center"> %</label>
                   </div>
+                  <div className="flex flex-row gap-4 justify-between print:hidden">
+                    <label htmlFor={`ganancia-${id}`} className="self-center">Ganancia:</label>
+                    <div className="relative w-full lg:w-20">
+                      <input
+                        type="number"
+                        className="w-20 h-10 px-2 pr-6 border-none border-gray-300 rounded focus:outline-none"
+                        id={`ganancia-${id}`}
+                        min={0}
+                        max={100}
+                        value={ganancia[id] === undefined ? "" : ganancia[id]}
+                        onChange={(e) => handleGananciaChange(id, e.target.value)}
+                      />
+                      <span className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500">%</span>
+                    </div>
+                  </div>
+                  <p className="text-md font-medium text-left hidden print:block print:ml-auto text-nowrap">
+                    Subtotal: ${((cart[id] * productDetails[id]?.product.price) * (1 + ganancia[id] / 100)).toFixed(2)}
+                  </p>
                   <button
                     className="bg-red-600 text-white px-4 py-2 rounded-md print:hidden"
                     onClick={() => handleRemoveProduct(id)}
@@ -172,6 +191,7 @@ const Presupuesto = () => {
                     Eliminar
                   </button>
                 </div>
+
               </div>
             ))}
           </div>

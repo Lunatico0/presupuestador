@@ -47,3 +47,13 @@ input {
   -webkit-appearance: none;
   -moz-appearance: none;
 }
+
+@media print {
+  :root{
+    margin-inline: -4rem;
+    padding: 0;
+  }
+  body {
+    filter: grayscale(100%);
+  }
+}
