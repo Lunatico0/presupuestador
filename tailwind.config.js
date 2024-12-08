@@ -1,3 +1,6 @@
+// Importa el plugin de Tailwind CSS directamente con `import`
+import lineClamp from '@tailwindcss/line-clamp';
+
 /** @type {import('tailwindcss').Config} */
 export default {
   mode: 'jit',
@@ -7,7 +10,7 @@ export default {
   ],
   theme: {
     extend: {
-      fontFamily:{
+      fontFamily: {
         "titleFont": "'Josefin Sans', sans-serif",
       },
       colors: {
@@ -23,5 +26,5 @@ export default {
       },
     },
   },
-  plugins: [require('@tailwindcss/line-clamp')],
-}
+  plugins: [lineClamp],  // Usa el import en vez de `require`
+};
