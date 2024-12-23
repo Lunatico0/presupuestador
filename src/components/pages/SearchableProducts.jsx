@@ -23,7 +23,16 @@ const SearchableProducts = () => {
 
   return (
     <div className="relative group px-6">
-      <Search search={search} setSearch={setSearch} type="products" />
+      <Search
+        search={search}
+        setSearch={setSearch}
+        type="products"
+        customData={products}
+        onSelect={(selectedProduct) => {
+          console.log("Producto seleccionado:", selectedProduct);
+        }}
+        searchFields={["description", "title", "categoriaNombre", "subcategoriaNombre"]}
+      />
       <ProductsList products={filteredProducts} />
     </div>
   );

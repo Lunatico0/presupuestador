@@ -1,15 +1,37 @@
 import React, { useMemo, useState, useRef, useEffect } from "react";
 import { useSales } from "../../context/salesContext.jsx";
 import { useProducts } from "../../context/productContext.jsx";
+import { useClients } from "../../context/clientContext.jsx";
 import SuggestionsList from "./SuggestionsList.jsx";
+import { normalizeText } from "./normalizeText.js";
 
-const Search = ({ search, setSearch, type }) => {
-  const { sales } = useSales();
-  const { products } = useProducts();
+const Search = ({ search, setSearch, type, customData, onSelect, searchFields, onNewClient }) => {
+  const contexts = { sales: useSales, clients: useClients, products: useProducts };
+  const { sales, clients, products } = {
+    sales: contexts.sales()?.sales || [],
+    clients: contexts.clients()?.clients || [],
+    products: contexts.products()?.products || [],
+  };
+
   const [isSuggestionsVisible, setIsSuggestionsVisible] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const searchRef = useRef(null);
   const suggestionsRef = useRef(null);
+
+  const typeSettings = {
+    sales: {
+      placeholder: "Buscar ventas...",
+      display: (item) => `${item.client?.name || ""} ${item.client?.lastName || ""}`,
+    },
+    products: {
+      placeholder: "Buscar productos...",
+      display: (item) => item.name || item.title || "",
+    },
+    clients: {
+      placeholder: "Buscar clientes...",
+      display: (item) => `${item.name || ""} ${item.lastName || ""} (${item.dni || "DNI no disponible"})`,
+    },
+  };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -24,18 +46,10 @@ const Search = ({ search, setSearch, type }) => {
     };
 
     document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const normalizeText = (text) => {
-    return text
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase();
-  };
+  const data = useMemo(() => customData || (type === "sales" ? sales : type === "products" ? products : clients), [customData, type, sales, products, clients]);
 
   const handleSearch = (event) => {
     setSearch(event.target.value);
@@ -43,68 +57,44 @@ const Search = ({ search, setSearch, type }) => {
     setSelectedIndex(-1);
   };
 
+  const predictions = useMemo(() => {
+    const normalizedSearch = normalizeText(search || "");
+    if (!normalizedSearch) return [];
+    const searchTerms = normalizedSearch.split(" ").filter(Boolean);
+
+    return data.filter((item) =>
+      searchFields.some((field) => searchTerms.every((term) => normalizeText(item[field] || "").includes(term)))
+    );
+  }, [data, search, searchFields]);
+
+  const handleSelect = (prediction) => {
+    setSearch(typeSettings[type]?.display(prediction) || "");
+    onSelect?.(prediction);
+    setIsSuggestionsVisible(false);
+  };
+
   const handleKeyDown = (event) => {
     if (event.key === "ArrowDown") {
-      setSelectedIndex((prevIndex) =>
-        Math.min(predictions.length - 1, prevIndex + 1)
-      );
+      setSelectedIndex((prevIndex) => Math.min(predictions.length - 1, prevIndex + 1));
     } else if (event.key === "ArrowUp") {
       setSelectedIndex((prevIndex) => Math.max(0, prevIndex - 1));
-    } else if (event.key === "Enter") {
-      if (selectedIndex >= 0 && predictions[selectedIndex]) {
-        handleSelect(predictions[selectedIndex]);
-      }
+    } else if (event.key === "Enter" && selectedIndex >= 0) {
+      handleSelect(predictions[selectedIndex]);
     } else if (event.key === "Escape") {
       setIsSuggestionsVisible(false);
     }
-  };
-
-  const predictions = useMemo(() => {
-    const normalizedSearch = normalizeText(search);
-    if (!normalizedSearch) {
-      return [];
-    }
-    const searchTerms = normalizedSearch.split(" ").filter(Boolean);
-
-    if (type === "sales") {
-      return sales.filter((sale) => {
-        const normalizedClient = normalizeText(
-          `${sale.client?.name || ""} ${sale.client?.lastName || ""}`
-        );
-        return searchTerms.every((term) => normalizedClient.includes(term));
-      });
-    } else if (type === "products") {
-      return products.filter((product) => {
-        const normalizedProductName = normalizeText(product.name || product.title || "");
-        return searchTerms.every((term) => normalizedProductName.includes(term));
-      });
-    }
-
-    return [];
-  }, [sales, products, search, type]);
-
-  const handleSelect = (prediction) => {
-    const displayValue =
-      type === "sales"
-        ? `${prediction.client?.name || ""} ${prediction.client?.lastName || ""}`
-        : prediction.name || prediction.title || "";
-    setSearch(displayValue);
-    setIsSuggestionsVisible(false);
   };
 
   return (
     <div ref={searchRef} className="relative">
       <input
         type="text"
-        placeholder={
-          type === "sales" ? "Buscar ventas..." : "Buscar productos..."
-        }
+        placeholder={typeSettings[type]?.placeholder || ""}
         onChange={handleSearch}
         onKeyDown={handleKeyDown}
         value={search}
         className="block w-full p-2 mb-2 border border-gray-300 rounded-md"
       />
-
       {isSuggestionsVisible && search && (
         <div ref={suggestionsRef}>
           <SuggestionsList
@@ -112,13 +102,9 @@ const Search = ({ search, setSearch, type }) => {
             selectedIndex={selectedIndex}
             setSelectedIndex={setSelectedIndex}
             onSelect={handleSelect}
-            getDisplayValue={(prediction) =>
-              type === "sales"
-                ? `${prediction.client?.name || "Nombre desconocido"} ${
-                    prediction.client?.lastName || ""
-                  }`
-                : prediction.name || prediction.title || "Sin título"
-            }
+            getDisplayValue={typeSettings[type]?.display}
+            onNewClient={onNewClient}
+            type={type}
           />
         </div>
       )}

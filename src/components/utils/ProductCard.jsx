@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import { useProducts } from "../../context/productContext";
+import SettingsApplicationsTwoToneIcon from '@mui/icons-material/SettingsApplicationsTwoTone';
 import Swal from 'sweetalert2';
+import ImageLazy from './ImageLazy.jsx'
 
 const ProductCard = ({ product, quantity, onQuantityChange, onAddToCart, onQuantityBlur }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -8,7 +10,7 @@ const ProductCard = ({ product, quantity, onQuantityChange, onAddToCart, onQuant
   const menuRef = useRef(null);
   const buttonRef = useRef(null);
 
-  const [editableQuantity, setEditableQuantity] = useState(quantity || '');
+  const [editableQuantity, setEditableQuantity] = useState(quantity || '' || 1);
 
   const handleClickOutside = (e) => {
     if (menuRef.current && !menuRef.current.contains(e.target) && !buttonRef.current.contains(e.target)) {
@@ -23,31 +25,24 @@ const ProductCard = ({ product, quantity, onQuantityChange, onAddToCart, onQuant
     };
   }, []);
 
-  useEffect(() => {
-    if (quantity !== editableQuantity) {
-      setEditableQuantity(quantity || '');
-    }
-  }, [quantity]);
-
   const handleMenuToggle = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
   const handleQuantityChange = (e) => {
     const value = e.target.value;
-    if (value === '' || !isNaN(value)) {
+
+    // Permitir solo números o vacío para edición
+    if (value === '' || /^[0-9]+$/.test(value)) {
       setEditableQuantity(value);
-      onQuantityChange(value);
+      onQuantityChange(value === '' ? '' : parseInt(value, 10));
     }
   };
 
   const handleQuantityBlur = () => {
-    if (editableQuantity === '' || isNaN(editableQuantity) || editableQuantity < 1) {
-      setEditableQuantity(1);
-      onQuantityBlur(1);  // Enviar el valor de 1 a la función de onBlur
-    } else {
-      onQuantityBlur(editableQuantity);  // Mantener el valor actual si es válido
-    }
+    const validQuantity = editableQuantity === '' || editableQuantity < 1 ? 1 : parseInt(editableQuantity, 10);
+    setEditableQuantity(validQuantity);
+    onQuantityBlur(validQuantity);
   };
 
   const handleEdit = () => {
@@ -64,7 +59,7 @@ const ProductCard = ({ product, quantity, onQuantityChange, onAddToCart, onQuant
       cancelButtonText: 'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
-        deleteProduct(product._id) // Llamar a la función deleteProduct desde el contexto
+        deleteProduct(product._id)
           .then(() => {
             Swal.fire('Eliminado!', 'El producto ha sido eliminado.', 'success');
           })
@@ -78,26 +73,32 @@ const ProductCard = ({ product, quantity, onQuantityChange, onAddToCart, onQuant
 
   return (
     <div className="relative rounded-lg shadow p-3 bg-secondary/40">
-      <div className="absolute top-0 right-0 p-2">
+      <div className="absolute top-0 right-0 p-2 z-10">
         <button className="text-xl" onClick={handleMenuToggle} ref={buttonRef}>
-          ⚙️
+          <SettingsApplicationsTwoToneIcon className='text-gray-500' fontSize="large"/>
         </button>
         {isMenuOpen && (
           <div
             ref={menuRef}
-            className="absolute bg-textLight z-10 shadow-lg rounded mt-1 w-32"
+            className="absolute bg-textLight dark:bg-dark z-10 shadow-lg rounded mt-1 w-32"
           >
-            <button onClick={handleEdit} className="block p-2 text-textDark/80">
+            <button onClick={handleEdit}
+            className="block p-2 text-textDark/80 dark:text-light">
               Editar producto
             </button>
-            <button onClick={handleDelete} className="block p-2 text-textDark/80">
+            <button onClick={handleDelete}
+            className="block p-2 text-textDark/80 dark:text-light">
               Eliminar producto
             </button>
           </div>
         )}
       </div>
 
-      <img src={product.thumbnails?.[0]} alt={product.title} className="w-full h-64 object-cover rounded-md" />
+      <ImageLazy
+        src={product.thumbnails?.[0]}
+        alt={product.title}
+        className="relative w-full h-fit z-0 object-cover rounded-md"
+      />
 
       <div className="relative rounded-xl flex flex-col items-start justify-between min-h-96">
         <h2 className="text-lg block text-left font-semibold">{product.title}</h2>
