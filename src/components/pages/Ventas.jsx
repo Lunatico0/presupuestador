@@ -72,7 +72,7 @@ const Ventas = () => {
             const address = clientData.address || {};
             return (
               <details key={venta._id} className="bg-gray-700 border border-gray-600 rounded-lg p-1 py-2 mb-1">
-                <summary className="cursor-pointer grid md:grid-cols-[1fr_3fr_1fr] grid-cols-[1fr_auto_1fr] justify-between md:justify-center items-center">
+                <summary className="cursor-pointer grid md:grid-cols-[1fr_3fr_1fr] grid-cols-[1fr_3fr_1fr] justify-between md:justify-center items-center">
                   <span className="font-semibold border-r border-gray-500 pr-1 md:border-none">{new Date(venta.date).toLocaleDateString()}</span>
                   <div className="pl-1 text-sm text-gray-300 md:text-left text-center mt-2 md:mt-0">
                     <p className="text-base text-left line-clamp-1"><strong>Cliente:</strong> {clientData.name} {clientData.lastName}</p>
@@ -81,7 +81,6 @@ const Ventas = () => {
                   <span className="font-bold text-lg text-green-400 text-right text-wrap md:text-nowrap">Total: ${calcularTotal(venta.products || []).toFixed(2)}</span>
                 </summary>
 
-                {/* Contenedor para centrar todo */}
                 <div className="flex flex-col items-center justify-center mt-4">
                   <div className="bg-gray-600 p-4 rounded-lg w-full max-w-4xl">
                     <p className="text-base"><strong>Email:</strong> {clientData.email}</p>
