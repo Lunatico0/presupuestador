@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useCallback } from "react";
+import { fetchWithErrorHandling } from "../components/utils/fetchUtils.js";
 
 const ClientsContext = createContext();
 
@@ -6,25 +7,16 @@ export const ClientsProvider = ({ children }) => {
   const [clients, setClients] = useState([]);
   const [clientDetails, setClientDetails] = useState({});
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const URL = import.meta.env.VITE_API_URL;
 
   const addClient = async (client) => {
     try {
       setLoading(true);
-      console.log(client);
-      const response = await fetch(`${URL}/api/clients/newClients`, {
+      const data = await fetchWithErrorHandling(`${URL}/api/clients/newClients`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(client),
+        body: client,
       });
-      console.log(response);
-      if (!response.ok) {
-        throw new Error(`Error adding client: ${response.statusText}`);
-      }
-      const data = await response.json();
-      console.log(data);
       setClients((prev) => [...prev, data]);
     } catch (error) {
       console.error("Error adding client:", error);
@@ -35,13 +27,17 @@ export const ClientsProvider = ({ children }) => {
 
   const fetchClients = async () => {
     setLoading(true);
+    setError("");
     try {
-      const response = await fetch(`${URL}/api/clients`);
-      if (!response.ok) throw new Error(`Error fetching clients: ${response.statusText}`);
-      const data = await response.json();
+      const data = await fetchWithErrorHandling(`${URL}/api/clients`);
+      if (!Array.isArray(data) || data.length === 0) {
+        setClients([]);
+        throw new Error("No hay clientes disponibles en la base de datos.");
+      }
       setClients(data);
     } catch (error) {
-      console.error("Error fetching clients:", error);
+      console.error("Error fetching clients:", error.message);
+      setError(error.message);
     } finally {
       setLoading(false);
     }
@@ -49,15 +45,15 @@ export const ClientsProvider = ({ children }) => {
 
   const findClientById = useCallback(
     async (id) => {
-      // Evita hacer el fetch si ya existe el cliente
+      if (!id) {
+        console.warn("El ID del cliente no es válido:", id);
+        return;
+      }
+
       if (clientDetails[id]) return;
 
       try {
-        const response = await fetch(`${URL}/api/clients/${id}`);
-        if (!response.ok) throw new Error(`Error fetching client: ${response.statusText}`);
-        const data = await response.json();
-
-        // Agrega el cliente al estado
+        const data = await fetchWithErrorHandling(`${URL}/api/clients/${id}`);
         setClientDetails((prev) => ({ ...prev, [id]: data }));
       } catch (error) {
         console.error(`Error buscando cliente ${id}:`, error);
@@ -67,14 +63,16 @@ export const ClientsProvider = ({ children }) => {
   );
 
   return (
-    <ClientsContext.Provider value={{
-      clients,
-      loading,
-      fetchClients,
-      addClient,
-      findClientById,
-      clientDetails
-    }}>
+    <ClientsContext.Provider
+      value={{
+        clients,
+        loading,
+        fetchClients,
+        addClient,
+        findClientById,
+        clientDetails,
+      }}
+    >
       {children}
     </ClientsContext.Provider>
   );

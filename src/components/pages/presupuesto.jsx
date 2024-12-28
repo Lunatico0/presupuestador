@@ -65,12 +65,10 @@ const Presupuesto = () => {
 
   const handleSaveClient = async () => {
     try {
-      // Llamar a addClient con el nuevo cliente
       await addClient(newClient);
 
       console.log("Nuevo cliente guardado:", newClient);
 
-      // Cerrar el formulario y reiniciar el estado después de agregar el cliente exitosamente
       setIsNewClientFormVisible(false);
       setNewClient({
         address: {

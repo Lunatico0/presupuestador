@@ -1,5 +1,6 @@
 import { data } from "autoprefixer";
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { fetchWithErrorHandling } from "../components/utils/fetchUtils.js";
 
 const SalesContext = createContext();
 
@@ -13,23 +14,15 @@ export const SalesProvider = ({ children }) => {
   const URL = import.meta.env.VITE_API_URL;
 
   const fetchSales = async (saleData) => {
-    try {
-      setLoading(true);
-      setError("");
+    setLoading(true);
+    setIsLoaded(false);
+    setError("");
 
-      const response = await fetch(`${URL}/api/sells`, {
+    try {
+      const result = await fetchWithErrorHandling(`${URL}/api/sells`, {
         method: saleData ? "POST" : "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: saleData ? JSON.stringify(saleData) : null,
       });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.message || "Error al procesar las ventas");
-      }
 
       if (saleData) {
         setSales((prevSales) => [...prevSales, result.venta]);
@@ -39,10 +32,8 @@ export const SalesProvider = ({ children }) => {
       }
 
       return result;
-
     } catch (err) {
       setError(`Error al procesar las ventas: ${err.message}`);
-      console.error(err);
       return null;
     } finally {
       setLoading(false);

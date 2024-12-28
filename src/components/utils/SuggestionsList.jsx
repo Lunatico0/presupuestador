@@ -26,7 +26,7 @@ const SuggestionsList = ({
         predictions.map((prediction, index) => (
           <li
             key={prediction._id}
-            className={`p-2 text-textDark cursor-pointer hover:bg-gray-100 ${index === selectedIndex ? "bg-gray-200" : ""}`}
+            className={`p-2 text-textDark text-nowrap cursor-pointer hover:bg-gray-100 ${index === selectedIndex ? "bg-gray-200" : ""}`}
             onClick={() => onSelect(prediction)}
             onMouseEnter={() => setSelectedIndex(index)}
           >

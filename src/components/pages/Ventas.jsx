@@ -4,9 +4,11 @@ import { useClients } from "../../context/clientContext.jsx";
 import { useProducts } from "../../context/productContext.jsx";
 import Search from "../utils/Search.jsx";
 import { filterItems } from "../utils/filteredItems.js";
+import SalesSearch from "../utils/salesSearch.jsx";
 
 const Ventas = () => {
   const [search, setSearch] = useState("");
+  const [filteredSales, setFilteredSales] = useState([]);
   const [selectedClient, setSelectedClient] = useState(null);
   const { sales, isLoaded, fetchSales, loading: salesLoading } = useSales();
   const { products, loading: productsLoading } = useProducts();
@@ -37,20 +39,6 @@ const Ventas = () => {
 
   const isDataLoading = !isLoaded || salesLoading || productsLoading || clientsLoading;
 
-  const filteredSales = useMemo(() => {
-    let filtered = sales;
-
-    if (selectedClient) {
-      filtered = filtered.filter((venta) => venta.client._id === selectedClient._id);
-    }
-
-    return filterItems(
-      filtered,
-      search,
-      (sale) => `${sale.client?.name || ""} ${sale.client?.lastName || ""}`
-    );
-  }, [sales, selectedClient, search]);
-
   const calcularTotal = (productos = []) =>
     productos.reduce(
       (acc, prod) => acc + (prod.salePrice - prod.buyPrice) * prod.quantity,
@@ -69,15 +57,13 @@ const Ventas = () => {
   return (
     <div className="w-full">
       <div className="max-w-full md:max-w-4xl mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-center mb-6">
+        <div className="flex flex-col justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-center">Ventas</h1>
-          <Search
-            search={search}
-            setSearch={setSearch}
-            type="sales"
-            customData={clients}
-            onSelect={handleSelectClient}
-            searchFields={["name", "lastName", "dni", "email"]}
+          <SalesSearch
+            sales={sales}
+            clients={clients}
+            products={products}
+            onFilter={setFilteredSales}
           />
         </div>
         <div className="overflow-auto max-h-[70dvh] w-full bg-gray-800 rounded-lg p-1 pt-2 md:p-2 shadow-md">
@@ -134,7 +120,6 @@ const Ventas = () => {
                   </h3>
                 </div>
               </details>
-
             );
           })}
         </div>

@@ -28,9 +28,6 @@ const SearchableProducts = () => {
         setSearch={setSearch}
         type="products"
         customData={products}
-        onSelect={(selectedProduct) => {
-          console.log("Producto seleccionado:", selectedProduct);
-        }}
         searchFields={["description", "title", "categoriaNombre", "subcategoriaNombre"]}
       />
       <ProductsList products={filteredProducts} />

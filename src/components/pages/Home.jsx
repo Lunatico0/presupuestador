@@ -27,8 +27,8 @@ const HomePage = () => {
         {/* Tarjeta 3 VENTAS */}
         <Link to="/ventas">
           <div className="p-6 bg-secondary text-light rounded-lg shadow-md hover:shadow-lg transition-all cursor-pointer">
-            <h3 className="text-xl font-bold mb-2">Caja</h3>
-            <p>Consulta el historial de ventas y el libro de caja.</p>
+            <h3 className="text-xl font-bold mb-2">Ventas</h3>
+            <p>Consulta el historial de ventas y sus detalles.</p>
           </div>
         </Link>
 
