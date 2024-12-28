@@ -55,7 +55,7 @@ const Ventas = () => {
   if (isDataLoading) return <div>Cargando ventas y productos...</div>;
 
   return (
-    <div className="w-full">
+    <div className="w-full px-2">
       <div className="max-w-full md:max-w-4xl mx-auto">
         <div className="flex flex-col justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-center">Ventas</h1>
@@ -66,30 +66,30 @@ const Ventas = () => {
             onFilter={setFilteredSales}
           />
         </div>
-        <div className="overflow-auto max-h-[70dvh] w-full bg-gray-800 rounded-lg p-1 pt-2 md:p-2 shadow-md">
+        <div className="overflow-auto max-h-[70dvh] w-full dark:bg-dark bg-gray-300 rounded-lg p-1 pt-2 md:p-2 shadow-md">
           {filteredSales.map((venta) => {
             const clientData = clientDetails[venta.client._id] || {};
             const address = clientData.address || {};
             return (
-              <details key={venta._id} className="bg-gray-700 border border-gray-600 rounded-lg p-1 py-2 mb-1">
+              <details key={venta._id} className="dark:bg-dark/90 bg-gray-200 border border-gray-300 rounded-lg p-1 py-2 mb-1">
                 <summary className="cursor-pointer grid md:grid-cols-[1fr_3fr_1fr] grid-cols-[1fr_3fr_1fr] justify-between md:justify-center items-center">
                   <span className="font-semibold border-r border-gray-500 pr-1 md:border-none">{new Date(venta.date).toLocaleDateString()}</span>
-                  <div className="pl-1 text-sm text-gray-300 md:text-left text-center mt-2 md:mt-0">
+                  <div className="pl-1 text-sm md:text-left text-center mt-2 md:mt-0">
                     <p className="text-base text-left line-clamp-1"><strong>Cliente:</strong> {clientData.name} {clientData.lastName}</p>
                     <p className="text-base text-left line-clamp-1"><strong>Dirección:</strong> {address.street ? `${address.street} ${address.number}` : "Dirección no disponible"}</p>
                   </div>
-                  <span className="font-bold text-lg text-green-400 text-right text-wrap md:text-nowrap">Total: ${calcularTotal(venta.products || []).toFixed(2)}</span>
+                  <span className="font-bold text-lg dark:text-primary text-secondary text-right text-wrap md:text-nowrap">Total: ${calcularTotal(venta.products || []).toFixed(2)}</span>
                 </summary>
 
                 <div className="flex flex-col items-center justify-center mt-4">
-                  <div className="bg-gray-600 p-4 rounded-lg w-full max-w-4xl">
+                  <div className="dark:bg-gray-600 bg-gray-400 p-4 rounded-lg w-full max-w-4xl">
                     <p className="text-base"><strong>Email:</strong> {clientData.email}</p>
                     <p className="text-base"><strong>Dirección:</strong> {address.street ? `${address.street} ${address.number}` : "Dirección no disponible"}</p>
                   </div>
 
                   <div className="mt-4 overflow-auto w-full max-w-4xl">
                     <table className="w-full border-collapse text-sm">
-                      <thead className="bg-gray-600">
+                      <thead className="dark:bg-gray-600 bg-gray-400">
                         <tr>
                           <th className="p-2 text-left">Cant.</th>
                           <th className="p-2 text-left">Título</th>
@@ -104,7 +104,7 @@ const Ventas = () => {
                           return (
                             <tr key={product.productId} className="border-t border-gray-500">
                               <td className="p-2">{product.quantity}</td>
-                              <td className="p-2 line-clamp-2">{titulo || "Cargando..."}</td>
+                              <td className="py-1 line-clamp-2">{titulo || "Cargando..."}</td>
                               <td className="p-2">${(product.salePrice * product.quantity).toFixed(2)}</td>
                               <td className="p-2">${(product.buyPrice * product.quantity).toFixed(2)}</td>
                               <td className="p-2">${((product.salePrice - product.buyPrice) * product.quantity).toFixed(2)}</td>

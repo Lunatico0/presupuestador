@@ -39,7 +39,7 @@ const Sidebar = () => {
       <div className="print:hidden relative">
         <button
           onClick={toggleSidebar}
-          className="print:hidden fixed top-4 left-4 z-50 text-logo bg-dark md:bg-gris p-2 rounded-full shadow-lg focus:outline-none hover:bg-secondary transition w-12 h-12"
+          className="print:hidden fixed top-4 left-4 z-50 dark:text-logo text-menu dark:bg-dark bg-gris/50 p-2 rounded-full shadow-lg focus:outline-none hover:bg-secondary transition w-12 h-12"
         >
           {isOpen ? <CloseIcon /> : <MenuIcon />}
         </button>
@@ -52,7 +52,7 @@ const Sidebar = () => {
 
       <nav
         ref={sidebarRef}
-        className={`print:hidden md:block fixed top-0 left-0 h-full bg-dark text-light transition-all duration-300 z-40 ${isOpen ? 'w-64 block' : 'w-20 hidden'} shadow-lg`}
+        className={`print:hidden md:block fixed top-0 left-0 h-full dark:bg-dark bg-gray-300 dark:text-textLight text-textDark transition-all duration-300 z-40 ${isOpen ? 'w-64 block' : 'w-20 hidden'} shadow-lg`}
       >
         <ul className="flex flex-col gap-4 p-4 mt-16">
           <li>

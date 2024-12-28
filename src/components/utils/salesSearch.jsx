@@ -47,9 +47,9 @@ const SalesSearch = ({ sales, clients, products, onFilter }) => {
 
   return (
     <div className="w-full max-w-4xl mx-auto mb-6">
-      <div className="bg-gray-800 rounded-lg shadow-md">
+      <div className="dark:bg-dark bg-gray-300 rounded-lg shadow-md">
         <h2 className="text-2xl px-4 py-3">Filtros</h2>
-        <form className="bg-gray-800 rounded-lg px-4 py-3 shadow-md space-y-4 md:space-y-0 md:flex md:justify-between md:items-center gap-1">
+        <form className="dark:bg-dark bg-gray-300 rounded-lg px-4 py-3 shadow-md space-y-4 md:space-y-0 md:flex md:justify-between md:items-center gap-1">
           <div className="relative w-full md:w-1/3">
             <input
               type="text"
@@ -57,10 +57,10 @@ const SalesSearch = ({ sales, clients, products, onFilter }) => {
               placeholder=" "
               value={filters.client}
               onChange={handleFilterChange}
-              className="block w-full border border-gray-300 rounded px-4 pt-4 pb-2 focus:border-blue-500 focus:outline-none bg-gray-700 text-white"
+              className="block w-full border border-gray-300 rounded px-4 pt-4 pb-2 focus:border-blue-500 focus:outline-none dark:bg-dark bg-gray-200"
             />
             <label
-              className="absolute left-4 top-0 text-gray-400 text-sm transition-all transform -translate-y-1/2 px-1 rounded-full pr-2"
+              className="absolute left-4 top-0 text-sm transition-all transform -translate-y-1/2 px-1 rounded-full pr-2"
               style={{
                 backdropFilter: 'blur(3px)',
               }}
@@ -75,10 +75,10 @@ const SalesSearch = ({ sales, clients, products, onFilter }) => {
               placeholder=" "
               value={filters.product}
               onChange={handleFilterChange}
-              className="block w-full border border-gray-300 rounded px-4 pt-4 pb-2 focus:border-blue-500 focus:outline-none bg-gray-700 text-white"
+              className="block w-full border border-gray-300 rounded px-4 pt-4 pb-2 focus:border-blue-500 focus:outline-none dark:bg-dark bg-gray-200"
             />
             <label
-              className="absolute left-4 top-0 text-gray-400 text-sm transition-all transform -translate-y-1/2 px-1 rounded-full pr-2"
+              className="absolute left-4 top-0 text-sm transition-all transform -translate-y-1/2 px-1 rounded-full pr-2"
               style={{ backdropFilter: 'blur(3px)' }}
             >
               Producto
@@ -90,10 +90,10 @@ const SalesSearch = ({ sales, clients, products, onFilter }) => {
               name="startDate"
               value={filters.startDate}
               onChange={handleFilterChange}
-              className="block w-full border border-gray-300 rounded px-4 pt-4 pb-2 focus:border-blue-500 focus:outline-none bg-gray-700 text-white"
+              className="block w-full border border-gray-300 rounded px-4 pt-4 pb-2 focus:border-blue-500 focus:outline-none dark:bg-dark bg-gray-200"
             />
             <label
-              className="absolute left-4 top-0 text-gray-400 text-sm transition-all transform -translate-y-1/2 px-1 bg-gray-800"
+              className="absolute left-4 top-0 text-sm transition-all transform -translate-y-1/2 px-1 rounded-full pr-2"
               style={{ backdropFilter: 'blur(3px)' }}
             >
               Desde
@@ -105,10 +105,10 @@ const SalesSearch = ({ sales, clients, products, onFilter }) => {
               name="endDate"
               value={filters.endDate}
               onChange={handleFilterChange}
-              className="block w-full border border-gray-300 rounded px-4 pt-4 pb-2 focus:border-blue-500 focus:outline-none bg-gray-700 text-white"
+              className="block w-full border border-gray-300 rounded px-4 pt-4 pb-2 focus:border-blue-500 focus:outline-none dark:bg-dark bg-gray-200"
             />
             <label
-              className="absolute left-4 top-0 text-gray-400 text-sm transition-all transform -translate-y-1/2 px-1 bg-gray-800"
+              className="absolute left-4 top-0 text-sm transition-all transform -translate-y-1/2 px-1 rounded-full pr-2"
               style={{ backdropFilter: 'blur(3px)' }}
             >
               Hasta

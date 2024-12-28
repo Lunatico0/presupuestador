@@ -22,9 +22,10 @@ export default {
         "dark": '#333333',
         "gris": "#424242",
         "secondary": '#4a4a4a',
-        "acento": "#3dd1ff"
+        "acento": "#3dd1ff",
+        "menu": "#7b5b21",
       },
     },
   },
-  plugins: [lineClamp],  // Usa el import en vez de `require`
+  plugins: [lineClamp],
 };
