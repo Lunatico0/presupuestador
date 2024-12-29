@@ -2,14 +2,11 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useSales } from "../../context/salesContext.jsx";
 import { useClients } from "../../context/clientContext.jsx";
 import { useProducts } from "../../context/productContext.jsx";
-import Search from "../utils/Search.jsx";
-import { filterItems } from "../utils/filteredItems.js";
 import SalesSearch from "../utils/salesSearch.jsx";
 
 const Ventas = () => {
-  const [search, setSearch] = useState("");
   const [filteredSales, setFilteredSales] = useState([]);
-  const [selectedClient, setSelectedClient] = useState(null);
+  const [setSelectedClient] = useState(null);
   const { sales, isLoaded, fetchSales, loading: salesLoading } = useSales();
   const { products, loading: productsLoading } = useProducts();
   const { clients, fetchClients, clientDetails, loading: clientsLoading, findClientById } = useClients();
@@ -53,6 +50,7 @@ const Ventas = () => {
   const handleSelectClient = (client) => setSelectedClient(client);
 
   if (isDataLoading) return <div>Cargando ventas y productos...</div>;
+  if (sales.length === 0) return <div>No hay ventas realizadas.</div>;
 
   return (
     <div className="w-full px-2">
