@@ -66,12 +66,12 @@ const Ventas = () => {
             onFilter={setFilteredSales}
           />
         </div>
-        <div className="overflow-auto max-h-[70dvh] w-full dark:bg-dark bg-gray-300 rounded-lg p-1 pt-2 md:p-2 shadow-md">
+        <div className="overflow-auto max-h-[70dvh] w-full dark:bg-gray-800 bg-gray-300 rounded-lg p-1 pt-2 md:p-2 shadow-md">
           {filteredSales.map((venta) => {
             const clientData = clientDetails[venta.client._id] || {};
             const address = clientData.address || {};
             return (
-              <details key={venta._id} className="dark:bg-dark/90 bg-gray-200 border border-gray-300 rounded-lg p-1 py-2 mb-1">
+              <details key={venta._id} className="dark:bg-gray-700/90 bg-gray-200 border dark:border-gray-600 border-gray-300 rounded-lg p-1 py-2 mb-1">
                 <summary className="cursor-pointer grid md:grid-cols-[1fr_3fr_1fr] grid-cols-[1fr_3fr_1fr] justify-between md:justify-center items-center">
                   <span className="font-semibold border-r border-gray-500 pr-1 md:border-none">{new Date(venta.date).toLocaleDateString()}</span>
                   <div className="pl-1 text-sm md:text-left text-center mt-2 md:mt-0">

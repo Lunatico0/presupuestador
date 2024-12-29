@@ -527,7 +527,7 @@ const Presupuesto = () => {
                   <h2 className="text-lg font-semibold text-left">
                     {productDetails[id]?.product.title}
                   </h2>
-                  <p className="line-clamp-2 print:line-clamp-4 text-sm text-gray-400 text-left">
+                  <p className="line-clamp-2 print:line-clamp-4 text-sm dark:text-gray-400 text-gray-700 text-left">
                     {
                       productDetails[id]?.product.description.filter((desc) =>
                         desc.label === 'MEDIDAS' ||
