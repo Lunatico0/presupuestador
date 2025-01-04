@@ -83,11 +83,11 @@ const ProductCard = ({ product, quantity, onQuantityChange, onAddToCart, onQuant
             className="absolute bg-textLight dark:bg-dark z-10 shadow-lg rounded mt-1 w-32"
           >
             <button onClick={handleEdit}
-              className="block p-2 text-textDark/80 dark:text-light">
+              className="block p-2 hover:bg-gray-200 dark:hover:bg-gray-600 rounded w-full">
               Editar producto
             </button>
             <button onClick={handleDelete}
-              className="block p-2 text-textDark/80 dark:text-light">
+              className="block p-2 hover:bg-gray-200 dark:hover:bg-gray-600 rounded w-full">
               Eliminar producto
             </button>
           </div>
@@ -97,7 +97,7 @@ const ProductCard = ({ product, quantity, onQuantityChange, onAddToCart, onQuant
       <ImageLazy
         src={product.thumbnails?.[0]}
         alt={product.title}
-        className="z-10 object-cover aspect-square w-[340px] h-[340px]"
+        className="z-10 object-cover aspect-square w-auto h-auto"
         loading="lazy"
       />
 

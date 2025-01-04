@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const SalesSearch = ({ sales, clients, products, onFilter }) => {
+const SalesSearch = ({ sales, clients, products, onFilter, sortValue, sortOnChange }) => {
   const [filters, setFilters] = useState({
     client: "",
     product: "",
@@ -48,7 +48,22 @@ const SalesSearch = ({ sales, clients, products, onFilter }) => {
   return (
     <div className="w-full max-w-4xl mx-auto mb-6">
       <div className="dark:bg-gray-800 bg-gray-300 rounded-lg shadow-md">
-        <h2 className="text-2xl px-4 py-3">Filtros</h2>
+        <div className="mb-4 flex justify-between items-center px-4 pt-3">
+          <h2 className="text-2xl">Filtros</h2>
+          <div>
+            <label className="font-bold mr-2" htmlFor="sort">Ordenar por:</label>
+            <select
+              id="sort"
+              value={sortValue}
+              onChange={sortOnChange}
+              className="p-2 border rounded"
+            >
+              <option value="fecha">Fecha</option>
+              <option value="ganancia">Ganancia</option>
+              <option value="cliente">Cliente</option>
+            </select>
+          </div>
+        </div>
         <form className="dark:bg-gray-800 bg-gray-300 rounded-lg px-4 py-3 shadow-md space-y-4 md:space-y-0 md:flex md:justify-between md:items-center gap-1">
           <div className="relative w-full md:w-1/3">
             <input

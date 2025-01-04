@@ -9,13 +9,14 @@ export const ClientsProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const URL = import.meta.env.VITE_API_URL;
+  // const URL = 'http://localhost:8080'
 
   const addClient = async (client) => {
     try {
       setLoading(true);
       const data = await fetchWithErrorHandling(`${URL}/api/clients/newClients`, {
         method: "POST",
-        body: client,
+        body: JSON.stringify(client),
       });
       setClients((prev) => [...prev, data]);
     } catch (error) {
