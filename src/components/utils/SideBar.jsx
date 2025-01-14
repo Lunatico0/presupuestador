@@ -1,19 +1,45 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../../context/cartContext.jsx';
+import { useProducts } from '../../context/productContext.jsx';
+import { convertPricesToPesos } from './CurrencyExchange.js';
 import HomeIcon from '@mui/icons-material/Home';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
+import CurrencyExchange from '@mui/icons-material/CurrencyExchange';
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { cart } = useCart();
   const sidebarRef = useRef(null);
+  const { products, setProducts } = useProducts();
+  const [dollarRate, setDollarRate] = useState({ sell: 1 });
+  const [isPesos, setIsPesos] = useState(true);
 
   const toggleSidebar = () => setIsOpen(!isOpen);
+
+  useEffect(() => {
+    const fetchDollarRate = async () => {
+      try {
+        const response = await fetch('https://dolarapi.com/v1/dolares');
+        const data = await response.json();
+        const oficial = data.find((dolar) => dolar.casa === 'oficial');
+        setDollarRate({ sell: parseFloat(oficial.venta) });
+      } catch (error) {
+        console.error('Error al obtener la tasa de cambio:', error);
+      }
+    };
+    fetchDollarRate();
+  }, []);
+
+  const handleCurrencyExchange = () => {
+    const updatedProducts = convertPricesToPesos(products, dollarRate, isPesos);
+    setProducts(updatedProducts);
+    setIsPesos((prevState) => !prevState);
+  };
 
   const handleClickOutside = (event) => {
     if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
@@ -74,7 +100,6 @@ const Sidebar = () => {
             </Link>
           </li>
           <li className="relative">
-            {/* Enlace del carrito con indicador */}
             <Link
               to="/presupuesto"
               className={`flex items-center gap-3 p-3 rounded hover:bg-secondary transition-all duration-300 ${isOpen ? '' : 'justify-center'}`}
@@ -96,6 +121,15 @@ const Sidebar = () => {
               <AttachMoneyIcon />
               {isOpen && <span className="text-lg">Ventas</span>}
             </Link>
+          </li>
+          <li>
+            <button
+              className={`flex items-center gap-3 p-3 rounded hover:bg-secondary transition-all duration-300 ${isOpen ? '' : 'justify-center'}`}
+              onClick={handleCurrencyExchange}
+            >
+              <CurrencyExchange />
+              {isOpen && <span className="text-lg text-nowrap">Cambiar a {isPesos ? 'Pesos' :  'Dólares'}</span>}
+            </button>
           </li>
         </ul>
       </nav>

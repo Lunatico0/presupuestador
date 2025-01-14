@@ -134,7 +134,8 @@ export const ProductsProvider = ({ children }) => {
         error,
         productDetails,
         fetchProductById,
-        deleteProduct
+        deleteProduct,
+        setProducts
       }}
     >
       {children}
