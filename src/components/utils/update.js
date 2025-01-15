@@ -3,7 +3,7 @@ export const checkForUpdates = async (setHasUpdate) => {
     const currentVersionResponse = await fetch('/version.json');
     const currentVersion = await currentVersionResponse.json();
 
-    const remoteVersionResponse = await fetch('http://localhost:5173/version.json');
+    const remoteVersionResponse = await fetch('https://presupuesto.artemisa-pvc.com/version.json');
     const remoteVersion = await remoteVersionResponse.json();
 
     if (currentVersion.version !== remoteVersion.version) {
