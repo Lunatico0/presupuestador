@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useCart } from '../../context/cartContext.jsx';
 import { useProducts } from '../../context/productContext.jsx';
 import { convertPricesToPesos } from './CurrencyExchange.js';
+import { checkForUpdates, applyUpdate } from './update';
 import HomeIcon from '@mui/icons-material/Home';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
@@ -10,6 +11,7 @@ import InventoryIcon from '@mui/icons-material/Inventory';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import CurrencyExchange from '@mui/icons-material/CurrencyExchange';
+import UpdateIcon from '@mui/icons-material/Update';
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -18,11 +20,13 @@ const Sidebar = () => {
   const { products, setProducts } = useProducts();
   const [dollarRate, setDollarRate] = useState({ sell: 1 });
   const [isPesos, setIsPesos] = useState(true);
+  const [hasUpdate, setHasUpdate] = useState(false);
 
   const toggleSidebar = () => setIsOpen(!isOpen);
 
   useEffect(() => {
     const fetchDollarRate = async () => {
+      checkForUpdates(setHasUpdate);
       try {
         const response = await fetch('https://dolarapi.com/v1/dolares');
         const data = await response.json();
@@ -124,11 +128,24 @@ const Sidebar = () => {
           </li>
           <li>
             <button
-              className={`flex items-center gap-3 p-3 rounded hover:bg-secondary transition-all duration-300 ${isOpen ? '' : 'justify-center'}`}
+              className={`flex items-center gap-3 p-3 rounded hover:bg-secondary
+                ${isOpen ? '' : 'justify-center'}
+                transform transition-transform duration-300
+                ${isPesos ? 'animate-flipY' : ''}`}
               onClick={handleCurrencyExchange}
             >
               <CurrencyExchange />
-              {isOpen && <span className="text-lg text-nowrap">Cambiar a {isPesos ? 'Pesos' :  'Dólares'}</span>}
+              {isOpen && <span className="text-lg whitespace-nowrap">Cambiar a {isPesos ? 'Pesos' : 'Dólares'}</span>}
+            </button>
+          </li>
+          <li>
+            <button
+              className={`flex items-center gap-3 p-3 rounded hover:bg-secondary transition-all duration-300 ${isOpen ? '' : 'justify-center'}`}
+              onClick={applyUpdate}
+            >
+              <UpdateIcon />
+              {hasUpdate && <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full" />}
+              {isOpen && <span className="text-lg">Actualizar</span>}
             </button>
           </li>
         </ul>
