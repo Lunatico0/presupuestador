@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
+import { useNavigate } from "react-router-dom";
 import { useProducts } from "../../context/productContext";
 import SettingsApplicationsTwoToneIcon from '@mui/icons-material/SettingsApplicationsTwoTone';
 import Swal from 'sweetalert2';
@@ -7,6 +8,7 @@ import ImageLazy from './ImageLazy.jsx'
 const ProductCard = ({ product, quantity, onQuantityChange, onAddToCart, onQuantityBlur }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { deleteProduct } = useProducts();
+  const navigate = useNavigate();
   const menuRef = useRef(null);
   const buttonRef = useRef(null);
 
@@ -46,7 +48,7 @@ const ProductCard = ({ product, quantity, onQuantityChange, onAddToCart, onQuant
   };
 
   const handleEdit = () => {
-    window.location.href = `/edit-product/${product._id}`;
+    navigate("/edit-product/" + product._id);
   };
 
   const handleDelete = () => {
