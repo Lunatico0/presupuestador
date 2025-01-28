@@ -9,6 +9,8 @@ export const ProductsProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const [productDetails, setProductDetails] = useState({});
   const [fetchedIds, setFetchedIds] = useState(new Set());
+  const [isPesos, setIsPesos] = useState(false);
+  const [dollarRate, setDollarRate] = useState();
 
   const fetchProductById = async (id) => {
     if (!fetchedIds.has(id)) {
@@ -135,7 +137,11 @@ export const ProductsProvider = ({ children }) => {
         productDetails,
         fetchProductById,
         deleteProduct,
-        setProducts
+        setProducts,
+        isPesos,
+        setIsPesos,
+        dollarRate,
+        setDollarRate,
       }}
     >
       {children}

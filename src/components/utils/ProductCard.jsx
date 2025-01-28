@@ -7,10 +7,13 @@ import ImageLazy from './ImageLazy.jsx'
 
 const ProductCard = ({ product, quantity, onQuantityChange, onAddToCart, onQuantityBlur }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { deleteProduct } = useProducts();
+  const { deleteProduct, isPesos, dollarRate } = useProducts();
   const navigate = useNavigate();
   const menuRef = useRef(null);
   const buttonRef = useRef(null);
+  const transformedPrice = isPesos
+    ? (product.price * dollarRate.sell).toFixed(2)
+    : product.price.toFixed(2);
 
   const [editableQuantity, setEditableQuantity] = useState(quantity || '' || 1);
 
@@ -34,7 +37,6 @@ const ProductCard = ({ product, quantity, onQuantityChange, onAddToCart, onQuant
   const handleQuantityChange = (e) => {
     const value = e.target.value;
 
-    // Permitir solo números o vacío para edición
     if (value === '' || /^[0-9]+$/.test(value)) {
       setEditableQuantity(value);
       onQuantityChange(value === '' ? '' : parseInt(value, 10));
@@ -108,7 +110,7 @@ const ProductCard = ({ product, quantity, onQuantityChange, onAddToCart, onQuant
         {product.description.map((desc) => (
           <p key={desc._id += 1} className="line-clamp-2">{desc.label}: {desc.value}</p>
         ))}
-        <p className="mt-1 font-bold">${typeof product.price === 'number' ? product.price.toFixed(2) : parseFloat(product.price).toFixed(2)}</p>
+        <p className="mt-1 font-bold">{isPesos ? "ARS" : "USD"} ${transformedPrice}</p>
 
         <div className="flex flex-row w-full gap-1 lg:gap-4">
           <label htmlFor="cantidad" className="self-center">Cant:</label>

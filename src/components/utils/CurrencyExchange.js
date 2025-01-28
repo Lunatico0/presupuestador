@@ -4,7 +4,7 @@ export const convertPricesToPesos = (products, dollarRate, toPesos) => {
   return products.map((product) => ({
     ...product,
     price: toPesos
-      ? (product.price * parseFloat(dollarRate.sell)).toFixed(2)
-      : (product.price / parseFloat(dollarRate.sell)).toFixed(2),
+      ? (product.price / parseFloat(dollarRate.sell)).toFixed(2)
+      : (product.price * parseFloat(dollarRate.sell)).toFixed(2),
   }));
 };

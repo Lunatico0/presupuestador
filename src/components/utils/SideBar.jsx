@@ -18,31 +18,26 @@ const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { cart } = useCart();
   const sidebarRef = useRef(null);
-  const { products, setProducts } = useProducts();
-  const [dollarRate, setDollarRate] = useState({ sell: 1 });
-  const [isPesos, setIsPesos] = useState(true);
+  const { isPesos, setIsPesos, dollarRate, setDollarRate } = useProducts();
   const [hasUpdate, setHasUpdate] = useState(false);
 
   const toggleSidebar = () => setIsOpen(!isOpen);
 
   useEffect(() => {
     const fetchDollarRate = async () => {
-      checkForUpdates(setHasUpdate);
       try {
-        const response = await fetch('https://dolarapi.com/v1/dolares');
+        const response = await fetch("https://dolarapi.com/v1/dolares");
         const data = await response.json();
-        const oficial = data.find((dolar) => dolar.casa === 'oficial');
+        const oficial = data.find((dolar) => dolar.casa === "oficial");
         setDollarRate({ sell: parseFloat(oficial.venta) });
       } catch (error) {
-        console.error('Error al obtener la tasa de cambio:', error);
+        console.error("Error al obtener la tasa de cambio:", error);
       }
     };
     fetchDollarRate();
-  }, []);
+  }, [setDollarRate]);
 
   const handleCurrencyExchange = () => {
-    const updatedProducts = convertPricesToPesos(products, dollarRate, isPesos);
-    setProducts(updatedProducts);
     setIsPesos((prevState) => !prevState);
   };
 
@@ -136,7 +131,7 @@ const Sidebar = () => {
               onClick={handleCurrencyExchange}
             >
               <CurrencyExchange />
-              {isOpen && <span className="text-lg whitespace-nowrap">Cambiar a {isPesos ? 'Pesos' : 'Dólares'}</span>}
+              {isOpen && <span className="text-lg whitespace-nowrap">Cambiar a {isPesos ? "Dólares" : "Pesos"}</span>}
             </button>
           </li>
           <li className='relative'>
