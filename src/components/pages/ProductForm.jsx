@@ -45,32 +45,35 @@ const ProductForm = () => {
   useEffect(() => {
     const loadProduct = async () => {
       if (id) {
-        const fetchedProduct = await fetchProductById(id);
-        if (fetchedProduct) {
-          const productData = fetchedProduct.product || fetchedProduct;
+        await fetchProductById(id); // Llama a la función para traer los datos
 
-          // Mapea el producto recibido para ajustarlo al formato esperado
-          const formattedProduct = {
-            ...productData,
-            category: {
-              categoriaNombre: productData.category?.categoriaNombre || "",
-              subcategoria: {
-                subcategoriaNombre: productData.category?.subcategoria?.subcategoriaNombre || "",
+        setTimeout(() => { // Esperamos un poco para asegurarnos de que `productDetails` se actualizó
+          const fetchedProduct = productDetails[id]?.product; // Accedemos correctamente a `product`
+
+          if (fetchedProduct) {
+            const formattedProduct = {
+              ...fetchedProduct,
+              category: {
+                categoriaNombre: fetchedProduct.category?.categoriaNombre || "",
+                subcategoria: {
+                  subcategoriaNombre: fetchedProduct.category?.subcategoria?.subcategoriaNombre || "",
+                },
               },
-            },
-            description: productData.description || [],
-            thumbnails: productData.thumbnails || [],
-          };
+              description: fetchedProduct.description || [],
+              thumbnails: fetchedProduct.thumbnails || [],
+            };
 
-          reset(formattedProduct); // Resetea el formulario con los datos formateados
-        }
+            reset(formattedProduct); // Reseteamos el formulario con los datos
+          }
+        }, 200); // Pequeño delay para que `productDetails` tenga tiempo de actualizarse
       } else {
-        reset(defaultValues); // Resetea el formulario a los valores iniciales
+        reset(defaultValues);
       }
     };
 
     loadProduct();
-  }, [id, fetchProductById, reset]);
+  }, [id, productDetails, reset]);
+
 
   const formatCategory = (categoryName) => {
     return categoryName.toLowerCase().replace(/\s+/g, "-");
@@ -93,18 +96,43 @@ const ProductForm = () => {
   const handleFormSubmit = async (data) => {
     try {
       const newData = formattedData(data);
+
+      newData.description = newData.description.filter(desc => desc.label.trim() !== "" && desc.value.trim() !== "");
+
       const response = await saveProduct(newData, id ? id : null);
+
+
+      const imageUrl = newData.thumbnails?.[0] || "https://via.placeholder.com/150";
+      const productTitle = newData.title || "Producto sin título";
+
+      navigate("/");
+
       Swal.fire({
-        title: "¡Éxito!",
-        text: response,
+        title: id ? "¡Producto actualizado!" : "¡Producto agregado!",
+        html: `
+        <div style="display: flex; flex-direction: column; align-items: center;">
+          <img src="${imageUrl}" alt="${productTitle}" style="width: 150px; height: 150px; object-fit: cover; border-radius: 10px; margin-bottom: 10px;">
+          <p style="font-size: 18px; font-weight: bold;">${productTitle}</p>
+        </div>
+      `,
         icon: "success",
         confirmButtonText: "Aceptar",
+      }).then(() => {
+        window.location.reload(); // Refresca la página después de aceptar
       });
-      navigate("/"); // Redirige al usuario a la página principal después de guardar
+
     } catch (error) {
       console.error("Error al guardar el producto:", error);
+
+      Swal.fire({
+        title: "Error",
+        text: "Hubo un problema al guardar el producto.",
+        icon: "error",
+        confirmButtonText: "Aceptar",
+      });
     }
   };
+
 
   if (loading) {
     return <p className="text-center">Cargando producto...</p>;

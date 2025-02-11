@@ -11,6 +11,7 @@ export const ProductsProvider = ({ children }) => {
   const [fetchedIds, setFetchedIds] = useState(new Set());
   const [isPesos, setIsPesos] = useState(false);
   const [dollarRate, setDollarRate] = useState();
+  console.log(productDetails)
 
   const fetchProductById = async (id) => {
     if (!fetchedIds.has(id)) {
@@ -38,7 +39,7 @@ export const ProductsProvider = ({ children }) => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch(`${URL}/api/products?limit=350`);
+        const response = await fetch(`${URL}/api/products?limit=500`);
         const data = await response.json();
         setProducts(data.payload);
       } catch (err) {
