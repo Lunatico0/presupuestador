@@ -1,5 +1,6 @@
 import emailjs from '@emailjs/browser';
 import Search from "../utils/Search.jsx";
+import Swal from "sweetalert2";
 import { Modal, Box } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useCart } from '../../context/cartContext.jsx';
@@ -9,6 +10,7 @@ import { useClients } from '../../context/clientContext.jsx';
 
 const Presupuesto = () => {
   const { fetchSales } = useSales();
+  const { isPesos, dollarRate } = useProducts();
   const { cart, setCart } = useCart();
   const [search, setSearch] = useState('');
   const { clients, fetchClients, addClient } = useClients();
@@ -38,6 +40,14 @@ const Presupuesto = () => {
     email: "",
     phone: "",
   });
+
+  const transformedPrice = (productPrice) => {
+    if (isPesos) {
+      return (productPrice * dollarRate.sell).toFixed(2);
+    } else {
+      return productPrice;
+    }
+  }
 
   const handleNewClient = () => {
     setIsNewClientFormVisible(true);
@@ -161,26 +171,26 @@ const Presupuesto = () => {
     window.print();
   };
 
-  const handleMail = () => {
-    const printableContent = document.getElementById("printable-content").innerHTML;
+  // const handleMail = () => {
+  //   const printableContent = document.getElementById("printable-content").innerHTML;
 
-    const templateParams = {
-      subject: "Presupuesto Artemisa",
-      to_email: "cliente@correo.com",
-      content: printableContent,
-    };
+  //   const templateParams = {
+  //     subject: "Presupuesto Artemisa",
+  //     to_email: "cliente@correo.com",
+  //     content: printableContent,
+  //   };
 
-    emailjs
-      .send("SERVICE_ID", "TEMPLATE_ID", templateParams, "USER_ID")
-      .then((response) => {
-        console.log("Email enviado con éxito:", response.status, response.text);
-        alert("El correo se ha enviado exitosamente.");
-      })
-      .catch((err) => {
-        console.error("Error al enviar el correo:", err);
-        alert("Hubo un problema al enviar el correo.");
-      });
-  };
+  //   emailjs
+  //     .send("SERVICE_ID", "TEMPLATE_ID", templateParams, "USER_ID")
+  //     .then((response) => {
+  //       console.log("Email enviado con éxito:", response.status, response.text);
+  //       alert("El correo se ha enviado exitosamente.");
+  //     })
+  //     .catch((err) => {
+  //       console.error("Error al enviar el correo:", err);
+  //       alert("Hubo un problema al enviar el correo.");
+  //     });
+  // };
 
   const calculateSubtotalWithoutIVA = () => Object.keys(cart).reduce((acc, id) => {
     const price = productDetails[id]?.product.price;
@@ -192,7 +202,12 @@ const Presupuesto = () => {
 
   const handleSell = async () => {
     if (!selectedClient) {
-      alert("Por favor, selecciona un cliente antes de registrar la venta.");
+      Swal.fire({
+        title: "¡Atención!",
+        text: "Por favor, selecciona un cliente antes de registrar la venta.",
+        icon: "warning",
+        confirmButtonText: "Aceptar",
+      });
       return;
     }
 
@@ -200,7 +215,7 @@ const Presupuesto = () => {
       const products = Object.keys(cart).map((id) => ({
         productId: id,
         quantity: cart[id],
-        salePrice: (productDetails[id]?.product.price * (1 + ganancia[id] / 100)),
+        salePrice: productDetails[id]?.product.price * (1 + ganancia[id] / 100),
         buyPrice: productDetails[id]?.product.price,
       }));
 
@@ -213,14 +228,25 @@ const Presupuesto = () => {
       const result = await fetchSales(newSale);
 
       if (result) {
-        alert("¡Venta registrada con éxito!");
+        Swal.fire({
+          title: "¡Éxito!",
+          text: "¡Venta registrada con éxito!",
+          icon: "success",
+          confirmButtonText: "Aceptar",
+        });
+
         setCart({});
         setSelectedClient(null);
         setIsClientModalOpen(false);
       }
     } catch (error) {
       console.error("Error al registrar la venta:", error);
-      alert("Hubo un problema al registrar la venta.");
+      Swal.fire({
+        title: "Error",
+        text: "Hubo un problema al registrar la venta. Inténtalo nuevamente.",
+        icon: "error",
+        confirmButtonText: "Aceptar",
+      });
     }
   };
 
@@ -228,8 +254,7 @@ const Presupuesto = () => {
     fetchClients();
   }, []);
 
-  const calculateIVA = () => calculateSubtotalWithoutIVA() * 0.21;
-  const calculateTotal = () => calculateSubtotalWithoutIVA() + calculateIVA();
+  const calculateTotal = () => calculateSubtotalWithoutIVA();
 
   return (
     <div className='w-full px-6'>
@@ -556,10 +581,10 @@ const Presupuesto = () => {
                     />
                   </div>
                   <p className="text-md font-medium text-left">
-                    Precio: ${(productDetails[id]?.product.price * (1 + ganancia[id] / 100)).toFixed(2)} <span className='print:hidden pl-1'>(Con ganancia incluida)</span>
+                    Precio: ${(transformedPrice(productDetails[id]?.product.price) * (1 + ganancia[id] / 100)).toFixed(2)} <span className='print:hidden pl-1'>(Con ganancia incluida)</span>
                   </p>
                   <p className="text-md font-medium text-left print:hidden">
-                    Subtotal: ${((cart[id] * productDetails[id]?.product.price) * (1 + ganancia[id] / 100)).toFixed(2)} <span className='print:hidden pl-1'>(Con ganancia incluida)</span>
+                    Subtotal: ${(transformedPrice(cart[id] * productDetails[id]?.product.price) * (1 + ganancia[id] / 100)).toFixed(2)} <span className='print:hidden pl-1'>(Con ganancia incluida)</span>
                   </p>
                 </div>
 
@@ -595,7 +620,7 @@ const Presupuesto = () => {
                       </div>
                     </div>
                     <p className="text-md font-medium text-left hidden print:block print:ml-auto text-nowrap">
-                      Subtotal: ${((cart[id] * productDetails[id]?.product.price) * (1 + ganancia[id] / 100)).toFixed(2)}
+                      Subtotal: ${(transformedPrice(cart[id] * productDetails[id]?.product.price) * (1 + ganancia[id] / 100)).toFixed(2)}
                     </p>
                   </div>
                   <button
@@ -611,9 +636,8 @@ const Presupuesto = () => {
 
           <div className='flex flex-row-reverse mt-1 md:mt-4 mb-12 gap-4 justify-between'>
             <div className="text-lg font-medium w-full print:w-2/5 md:w-1/3">
-              <div className='flex flex-row justify-between'><p>Subtotal: </p><span>${calculateSubtotalWithoutIVA().toFixed(2)}</span></div>
-              <div className='flex flex-row justify-between'><p>IVA: </p><span>${calculateIVA().toFixed(2)}</span></div>
-              <div className='flex flex-row justify-between'><p className="font-bold">Total: </p><span>${calculateTotal().toFixed(2)}</span></div>
+              <div className='flex flex-row justify-between'><p>Subtotal: </p><span>${transformedPrice(calculateSubtotalWithoutIVA().toFixed(2))}</span></div>
+              <div className='flex flex-row justify-between'><p className="font-bold">Total: </p><span>${transformedPrice(calculateTotal().toFixed(2))}</span></div>
             </div>
             <div className='flex flex-col md:items-center md:flex-row gap-1 md:gap-4 print:hidden'>
               <button

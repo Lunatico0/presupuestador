@@ -1,15 +1,28 @@
 import React, { useEffect } from "react";
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 import { useForm, useFieldArray } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { useProducts } from "../../context/productContext.jsx";
 
-const ProductForm = ({ onSubmit }) => {
-  const { id } = useParams();
-  const { productDetails, fetchProductById, loading } = useProducts();
-  const product = id ? productDetails[id]?.product || productDetails[id] : null;
-  const { saveProduct } = useProducts();
+const ProductForm = () => {
+  const { id } = useParams(); // Identifica si hay un ID para editar
+  const { productDetails, fetchProductById, saveProduct, loading } = useProducts();
   const navigate = useNavigate();
+
+  // Define valores iniciales vacíos para agregar un producto
+  const defaultValues = {
+    title: "",
+    price: "",
+    code: "",
+    stock: "",
+    status: true,
+    category: {
+      categoriaNombre: "",
+      subcategoria: { subcategoriaNombre: "" },
+    },
+    description: [],
+    thumbnails: [],
+  };
 
   const {
     register,
@@ -17,21 +30,7 @@ const ProductForm = ({ onSubmit }) => {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm({
-    defaultValues: {
-      title: "",
-      price: "",
-      code: "",
-      stock: "",
-      status: true,
-      category: {
-        categoriaNombre: "",
-        subcategoria: { subcategoriaNombre: "" },
-      },
-      description: [],
-      thumbnails: [],
-    },
-  });
+  } = useForm({ defaultValues });
 
   const { fields: descriptionFields, append: appendDescription, remove: removeDescription } = useFieldArray({
     control,
@@ -45,23 +44,40 @@ const ProductForm = ({ onSubmit }) => {
 
   useEffect(() => {
     const loadProduct = async () => {
-      if (id && !product) {
-        await fetchProductById(id);
+      if (id) {
+        const fetchedProduct = await fetchProductById(id);
+        if (fetchedProduct) {
+          const productData = fetchedProduct.product || fetchedProduct;
+
+          // Mapea el producto recibido para ajustarlo al formato esperado
+          const formattedProduct = {
+            ...productData,
+            category: {
+              categoriaNombre: productData.category?.categoriaNombre || "",
+              subcategoria: {
+                subcategoriaNombre: productData.category?.subcategoria?.subcategoriaNombre || "",
+              },
+            },
+            description: productData.description || [],
+            thumbnails: productData.thumbnails || [],
+          };
+
+          reset(formattedProduct); // Resetea el formulario con los datos formateados
+        }
+      } else {
+        reset(defaultValues); // Resetea el formulario a los valores iniciales
       }
     };
-    loadProduct();
-  }, [id, product, fetchProductById]);
 
-  useEffect(() => {
-    product && reset(product)
-  }, [product, reset]);
+    loadProduct();
+  }, [id, fetchProductById, reset]);
 
   const formatCategory = (categoryName) => {
-    return categoryName.toLowerCase().replace(/\s+/g, '-');
+    return categoryName.toLowerCase().replace(/\s+/g, "-");
   };
 
   const formattedData = (data) => {
-    const formatted = {
+    return {
       ...data,
       category: {
         categoriaNombre: data.category.categoriaNombre,
@@ -72,29 +88,28 @@ const ProductForm = ({ onSubmit }) => {
         },
       },
     };
-    ("Datos formateados: ", formatted);
-    return formatted;
   };
 
   const handleFormSubmit = async (data) => {
     try {
       const newData = formattedData(data);
-      const response = await saveProduct(newData, id);
+      const response = await saveProduct(newData, id ? id : null);
       Swal.fire({
-        title: '¡Éxito!',
+        title: "¡Éxito!",
         text: response,
-        icon: 'success',
-        confirmButtonText: 'Aceptar',
+        icon: "success",
+        confirmButtonText: "Aceptar",
       });
-      navigate('/');
+      navigate("/"); // Redirige al usuario a la página principal después de guardar
     } catch (error) {
-      console.error('Error al guardar el producto:', error);
+      console.error("Error al guardar el producto:", error);
     }
   };
 
   if (loading) {
     return <p className="text-center">Cargando producto...</p>;
   }
+
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="p-4 space-y-4 bg-gray-700 rounded-md">
@@ -237,7 +252,7 @@ const ProductForm = ({ onSubmit }) => {
       </div>
 
       <button type="submit" className="p-2 bg-green-500 text-white rounded">
-        {loading ? 'Guardando...' : 'Guardar'}
+        {loading ? "Guardando..." : id ? "Actualizar Producto" : "Agregar Producto"}
       </button>
     </form>
   );

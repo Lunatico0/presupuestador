@@ -9,9 +9,17 @@ const Ventas = () => {
   const [setSelectedClient] = useState(null);
   const [sortOption, setSortOption] = useState("fecha");
   const [filteredSales, setFilteredSales] = useState([]);
-  const { products, loading: productsLoading } = useProducts();
+  const { products, loading: productsLoading, isPesos, dollarRate } = useProducts();
   const { sales, isLoaded, fetchSales, loading: salesLoading } = useSales();
   const { clients, fetchClients, clientDetails, loading: clientsLoading, findClientById } = useClients();
+
+  const transformedPrice = (productPrice) => {
+    if (isPesos) {
+      return (productPrice * dollarRate.sell).toFixed(2);
+    } else {
+      return productPrice;
+    }
+  }
 
   useEffect(() => {
     if (!isLoaded) fetchSales();
@@ -93,7 +101,7 @@ const Ventas = () => {
           />
         </div>
         <div>
-          <h2 className="text-xl font-bold text-gray-300 text-right">Total ventas: ${sumatoriaVentas.toFixed(2)}</h2>
+          <h2 className="text-xl font-bold text-gray-300 text-right">Total ventas: ${transformedPrice(sumatoriaVentas.toFixed(2))}</h2>
         </div>
         <div className="overflow-auto max-h-[70dvh] w-full dark:bg-gray-800 bg-gray-300 rounded-lg p-1 pt-2 md:p-2 shadow-md">
           {filteredSales.map((venta) => {
@@ -109,9 +117,7 @@ const Ventas = () => {
                     <p className="text-base text-left line-clamp-1"><strong>Cliente:</strong> {clientData.name ? `${clientData.name} ${clientData.lastName}` : "No disponible."}</p>
                     <p className="text-base text-left line-clamp-1"><strong>Dirección:</strong> {address.street ? `${address.street} ${address.number}` : "No disponible."}</p>
                   </div>
-                  <span className="font-bold text-lg dark:text-primary text-secondary text-right text-wrap md:text-nowrap">
-                    Total: ${acumulado.toFixed(2)}
-                  </span>
+                  <span className="font-semibold text-right pl-1">${transformedPrice(totalVenta.toFixed(2))}</span>
                 </summary>
 
                 <div className="flex flex-col items-center justify-center mt-4">
@@ -139,9 +145,9 @@ const Ventas = () => {
                             <tr key={product.productId} className="border-t border-gray-500">
                               <td className="p-2">{product.quantity}</td>
                               <td className="py-1 line-clamp-2">{titulo || "Cargando..."}</td>
-                              <td className="p-2">${(product.salePrice * product.quantity).toFixed(2)}</td>
-                              <td className="p-2">${(product.buyPrice * product.quantity).toFixed(2)}</td>
-                              <td className="p-2">${((product.salePrice - product.buyPrice) * product.quantity).toFixed(2)}</td>
+                              <td className="p-2">${(transformedPrice(product.salePrice) * product.quantity).toFixed(2)}</td>
+                              <td className="p-2">${(transformedPrice(product.buyPrice) * product.quantity).toFixed(2)}</td>
+                              <td className="p-2">${((transformedPrice(product.salePrice) - transformedPrice(product.buyPrice)) * product.quantity).toFixed(2)}</td>
                             </tr>
                           );
                         })}

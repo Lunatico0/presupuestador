@@ -86,7 +86,7 @@ const Search = ({ search, setSearch, type, customData, onSelect, searchFields, o
   };
 
   return (
-    <div ref={searchRef} className="relative">
+    <div ref={searchRef} className="relative w-2/3">
       <input
         type="text"
         placeholder={typeSettings[type]?.placeholder || ""}
