@@ -171,26 +171,26 @@ const Presupuesto = () => {
     window.print();
   };
 
-  // const handleMail = () => {
-  //   const printableContent = document.getElementById("printable-content").innerHTML;
+  const handleMail = () => {
+    const printableContent = document.getElementById("printable-content").innerHTML;
 
-  //   const templateParams = {
-  //     subject: "Presupuesto Artemisa",
-  //     to_email: "cliente@correo.com",
-  //     content: printableContent,
-  //   };
+    const templateParams = {
+      subject: "Presupuesto Artemisa",
+      to_email: "cliente@correo.com",
+      content: printableContent,
+    };
 
-  //   emailjs
-  //     .send("SERVICE_ID", "TEMPLATE_ID", templateParams, "USER_ID")
-  //     .then((response) => {
-  //       console.log("Email enviado con éxito:", response.status, response.text);
-  //       alert("El correo se ha enviado exitosamente.");
-  //     })
-  //     .catch((err) => {
-  //       console.error("Error al enviar el correo:", err);
-  //       alert("Hubo un problema al enviar el correo.");
-  //     });
-  // };
+    emailjs
+      .send("SERVICE_ID", "TEMPLATE_ID", templateParams, "USER_ID")
+      .then((response) => {
+        console.log("Email enviado con éxito:", response.status, response.text);
+        alert("El correo se ha enviado exitosamente.");
+      })
+      .catch((err) => {
+        console.error("Error al enviar el correo:", err);
+        alert("Hubo un problema al enviar el correo.");
+      });
+  };
 
   const calculateSubtotalWithoutIVA = () => Object.keys(cart).reduce((acc, id) => {
     const price = productDetails[id]?.product.price;
