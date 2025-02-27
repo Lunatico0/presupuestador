@@ -31,9 +31,9 @@ const ProductsList = ({ products }) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
       {products.length > 0 ? (
-        products.map((product) => (
+        products.map((product, index) => (
           <ProductCard
-            key={product._id}
+            key={index}
             product={product}
             quantity={quantities[product._id] || ""}
             onQuantityChange={(value) => handleCantidadChange(product._id, value)}

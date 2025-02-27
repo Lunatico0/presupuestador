@@ -235,7 +235,7 @@ const ProductForm = () => {
       <div className="flex flex-col space-y-2">
         <label className="text-sm font-medium">Descripciones</label>
         {descriptionFields.map((field, index) => (
-          <div key={field.id} className="flex items-center space-x-2">
+          <div key={field._id} className="flex items-center space-x-2">
             <input
               type="text"
               placeholder="Etiqueta"
@@ -262,7 +262,7 @@ const ProductForm = () => {
       <div className="flex flex-col space-y-2">
         <label className="text-sm font-medium">Imágenes</label>
         {thumbnailFields.map((field, index) => (
-          <div key={field.id} className="flex items-center space-x-2">
+          <div key={field._id} className="flex items-center space-x-2">
             <input
               type="url"
               placeholder="URL de la imagen"

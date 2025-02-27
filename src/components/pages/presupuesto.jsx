@@ -1,19 +1,19 @@
 import emailjs from '@emailjs/browser';
-import Search from "../utils/Search.jsx";
 import Swal from "sweetalert2";
-import { Modal, Box } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useCart } from '../../context/cartContext.jsx';
 import { useProducts } from '../../context/productContext.jsx';
 import { useSales } from "../../context/salesContext.jsx";
 import { useClients } from '../../context/clientContext.jsx';
+import BudgetHeader from './presupuesto/BudgetHeader.jsx';
+import ModalBox from './presupuesto/ModalBox.jsx';
+import InputField from './presupuesto/InputField.jsx';
 
 const Presupuesto = () => {
   const { fetchSales } = useSales();
   const { isPesos, dollarRate } = useProducts();
   const { cart, setCart } = useCart();
-  const [search, setSearch] = useState('');
-  const { clients, fetchClients, addClient } = useClients();
+  const { clients, fetchClients, addClient, clientDetails, findClientById } = useClients();
   const [ganancia, setGanancia] = useState(() => {
     const initialGanancia = {};
     Object.keys(cart).forEach((id) => {
@@ -77,8 +77,6 @@ const Presupuesto = () => {
     try {
       await addClient(newClient);
 
-      console.log("Nuevo cliente guardado:", newClient);
-
       setIsNewClientFormVisible(false);
       setNewClient({
         address: {
@@ -100,19 +98,23 @@ const Presupuesto = () => {
     }
   };
 
-
-  const handleSelectClient = (client) => {
+  const handleSelectClient = async (client) => {
     setSelectedClient(client);
+    if (!clientDetails[client._id]) {
+      await findClientById(client._id);
+    }
   };
 
   useEffect(() => {
-    const updatedGanancia = { ...ganancia };
-    Object.keys(cart).forEach((id) => {
-      if (!(id in ganancia)) {
-        updatedGanancia[id] = 30;
-      }
+    setGanancia((prevGanancia) => {
+      const updatedGanancia = { ...prevGanancia };
+      Object.keys(cart).forEach((id) => {
+        if (!(id in prevGanancia)) {
+          updatedGanancia[id] = 30;
+        }
+      });
+      return updatedGanancia;
     });
-    setGanancia(updatedGanancia);
   }, [cart]);
 
   useEffect(() => {
@@ -163,17 +165,31 @@ const Presupuesto = () => {
     setCart((prevCart) => {
       const newCart = { ...prevCart };
       delete newCart[id];
-      return newCart;
+      return Object.keys(newCart).length ? newCart : {};
     });
   };
 
   const handlePrint = () => {
+    if (!selectedClient) {
+      setIsClientModalOpen(true);
+      return;
+    }
     window.print();
   };
 
   const handleMail = () => {
-    const printableContent = document.getElementById("printable-content").innerHTML;
+    if (!selectedClient) {
+      setIsClientModalOpen(true);
+      return;
+    }
 
+    const printableElement = document.getElementById("printable-content");
+    if (!printableElement) {
+      alert("No hay contenido para enviar.");
+      return;
+    }
+
+    const printableContent = printableElement.innerHTML;
     const templateParams = {
       subject: "Presupuesto Artemisa",
       to_email: "cliente@correo.com",
@@ -184,11 +200,11 @@ const Presupuesto = () => {
       .send("SERVICE_ID", "TEMPLATE_ID", templateParams, "USER_ID")
       .then((response) => {
         console.log("Email enviado con éxito:", response.status, response.text);
-        alert("El correo se ha enviado exitosamente.");
+        Swal.fire("Éxito", "El correo se ha enviado exitosamente.", "success");
       })
       .catch((err) => {
         console.error("Error al enviar el correo:", err);
-        alert("Hubo un problema al enviar el correo.");
+        Swal.fire("Error", "Hubo un problema al enviar el correo.", "error");
       });
   };
 
@@ -220,10 +236,11 @@ const Presupuesto = () => {
       }));
 
       const newSale = {
-        client: selectedClient,
+        client: selectedClient._id,
         products,
         date: new Date().toISOString(),
       };
+
 
       const result = await fetchSales(newSale);
 
@@ -251,291 +268,37 @@ const Presupuesto = () => {
   };
 
   useEffect(() => {
-    fetchClients();
-  }, []);
+    if (clients.length === 0) {
+      fetchClients();
+    }
+  }, [clients, fetchClients]);
 
   const calculateTotal = () => calculateSubtotalWithoutIVA();
 
   return (
     <div className='w-full px-6'>
-      <Modal
-        open={isClientModalOpen}
-        onClose={() => setIsClientModalOpen(false)}
-      >
-        <Box
-          className={`
-        dark:bg-gris
-        bg-light
-        dark:text-light
-        text-dark
-        shadow-black
-        p-4 rounded w-11/12 max-w-xl absolute left-1/2
-        transform-cpu -translate-x-1/2 -translate-y-1/2
-         ${isNewClientFormVisible ? 'top-2/4' : 'top-1/4'} `}
-        >
-          {isNewClientFormVisible ? (
-            <form className="p-4 space-y-4 flex flex-col justify-center">
-              <h3 className="text-gray-500 font-bold  mb-2">Datos personales</h3>
-              <div className="flex gap-4">
-                <div className="relative w-1/2">
-                  <input
-                    type="text"
-                    name="name"
-                    value={newClient.name}
-                    onChange={handleInputChange}
-                    className="block w-full border border-gray-300 rounded px-2 pt-4 pb-1 focus:border-blue-500 focus:outline-none"
-                  />
-                  <label
-                    className="absolute left-2 top-0 text-acento text-sm transition-all transform -translate-y-1/2 px-1 rounded pr-2"
-                    style={{
-                      backdropFilter: 'blur(3px)',
-                    }}
-                  >
-                    Nombre
-                  </label>
-                </div>
-                <div className="relative w-1/2">
-                  <input
-                    type="text"
-                    name="lastName"
-                    value={newClient.lastName}
-                    onChange={handleInputChange}
-                    className="block w-full border border-gray-300 rounded px-2 pt-4 pb-1 focus:border-blue-500 focus:outline-none"
-                  />
-                  <label
-                    className="absolute left-2 top-0 text-acento text-sm transition-all transform -translate-y-1/2 px-1 rounded pr-2"
-                    style={{
-                      backdropFilter: 'blur(3px)',
-                    }}
-                  >
-                    Apellido
-                  </label>
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <div className="relative w-1/2">
-                  <input
-                    type="number"
-                    name="phone"
-                    value={newClient.phone}
-                    onChange={handleInputChange}
-                    className="block w-full border border-gray-300 rounded px-2 pt-4 pb-1 focus:border-blue-500 focus:outline-none"
-                  />
-                  <label
-                    className="absolute left-2 top-0 text-acento text-sm transition-all transform -translate-y-1/2 px-1 rounded pr-2"
-                    style={{
-                      backdropFilter: 'blur(3px)',
-                    }}
-                  >
-                    Teléfono
-                  </label>
-                </div>
-                <div className="relative w-1/2">
-                  <input
-                    type="number"
-                    name="dni"
-                    value={newClient.dni}
-                    onChange={handleInputChange}
-                    className="block w-full border border-gray-300 rounded px-2 pt-4 pb-1 focus:border-blue-500 focus:outline-none"
-                  />
-                  <label
-                    className="absolute left-2 top-0 text-acento text-sm transition-all transform -translate-y-1/2 px-1 rounded pr-2"
-                    style={{
-                      backdropFilter: 'blur(3px)',
-                    }}
-                  >
-                    DNI
-                  </label>
-                </div>
-              </div>
-              <div className="relative">
-                <input
-                  type="email"
-                  name="email"
-                  value={newClient.email}
-                  onChange={handleInputChange}
-                  className="block w-full border border-gray-300 rounded px-2 pt-4 pb-1 focus:border-blue-500 focus:outline-none"
-                />
-                <label
-                  className="absolute left-2 top-0 text-acento text-sm transition-all transform -translate-y-1/2 px-1 rounded pr-2"
-                  style={{
-                    backdropFilter: 'blur(3px)',
-                  }}
-                >
-                  Email
-                </label>
-              </div>
-              <h3 className="text-gray-500 font-bold mt-6 mb-2">Dirección</h3>
-              <div className="flex gap-4">
-                <div className="relative w-3/4">
-                  <input
-                    type="text"
-                    name="address.street"
-                    value={newClient.address.street}
-                    onChange={handleInputChange}
-                    className="block w-full border border-gray-300 rounded px-2 pt-4 pb-1 focus:border-blue-500 focus:outline-none"
-                  />
-                  <label
-                    className="absolute left-2 top-0 text-acento text-sm transition-all transform -translate-y-1/2 px-1 rounded pr-2"
-                    style={{
-                      backdropFilter: 'blur(3px)',
-                    }}
-                  >
-                    Calle
-                  </label>
-                </div>
-                <div className="relative w-1/4">
-                  <input
-                    type="number"
-                    name="address.number"
-                    value={newClient.address.number}
-                    onChange={handleInputChange}
-                    className="block w-full border border-gray-300 rounded px-2 pt-4 pb-1 focus:border-blue-500 focus:outline-none"
-                  />
-                  <label
-                    className="absolute left-2 top-0 text-acento text-sm transition-all transform -translate-y-1/2 px-1 rounded pr-2"
-                    style={{
-                      backdropFilter: 'blur(3px)',
-                    }}
-                  >
-                    Número
-                  </label>
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <div className="relative w-1/2">
-                  <input
-                    type="text"
-                    name="address.city"
-                    value={newClient.address.city}
-                    onChange={handleInputChange}
-                    className="block w-full border border-gray-300 rounded px-2 pt-4 pb-1 focus:border-blue-500 focus:outline-none"
-                  />
-                  <label
-                    className="absolute left-2 top-0 text-acento text-sm transition-all transform -translate-y-1/2 px-1 rounded pr-2"
-                    style={{
-                      backdropFilter: 'blur(3px)',
-                    }}
-                  >
-                    Ciudad
-                  </label>
-                </div>
-                <div className="relative w-1/2">
-                  <input
-                    type="text"
-                    name="address.province"
-                    value={newClient.address.province}
-                    onChange={handleInputChange}
-                    className="block w-full border border-gray-300 rounded px-2 pt-4 pb-1 focus:border-blue-500 focus:outline-none"
-                  />
-                  <label
-                    className="absolute left-2 top-0 text-acento text-sm transition-all transform -translate-y-1/2 px-1 rounded pr-2"
-                    style={{
-                      backdropFilter: 'blur(3px)',
-                    }}
-                  >
-                    Provincia
-                  </label>
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <div className="relative w-1/2">
-                  <input
-                    type="text"
-                    name="address.country"
-                    value={newClient.address.country}
-                    onChange={handleInputChange}
-                    className="block w-full border border-gray-300 rounded px-2 pt-4 pb-1 focus:border-blue-500 focus:outline-none"
-                  />
-                  <label
-                    className="absolute left-2 top-0 text-acento text-sm transition-all transform -translate-y-1/2 px-1 rounded pr-2"
-                    style={{
-                      backdropFilter: 'blur(3px)',
-                    }}
-                  >
-                    País
-                  </label>
-                </div>
-                <div className="relative w-1/2">
-                  <input
-                    type="number"
-                    name="address.zipCode"
-                    value={newClient.address.zipCode}
-                    onChange={handleInputChange}
-                    className="block w-full border border-gray-300 rounded px-2 pt-4 pb-1 focus:border-blue-500 focus:outline-none"
-                  />
-                  <label
-                    className="absolute left-2 top-0 text-acento text-sm transition-all transform -translate-y-1/2 px-1 rounded pr-2"
-                    style={{
-                      backdropFilter: 'blur(3px)',
-                    }}
-                  >
-                    C.P.
-                  </label>
-                </div>
-              </div>
-              <div className="flex gap-4 mt-4">
-                <button
-                  type="button"
-                  onClick={handleSaveClient}
-                  className="px-4 py-2 bg-blue-500 rounded text-white"
-                >
-                  Guardar Cliente
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsNewClientFormVisible(false)}
-                  className="px-4 py-2 bg-gray-500 rounded text-white"
-                >
-                  Cancelar
-                </button>
-              </div>
-            </form>
-          ) : (
-            <>
-              <Search
-                search={search}
-                setSearch={setSearch}
-                type="clients"
-                customData={clients}
-                onSelect={handleSelectClient}
-                onNewClient={handleNewClient}
-                searchFields={["name", "lastName", "dni"]}
-              />
-              <div className='flex justify-between gap-2'>
-                <button
-                  className="px-4 py-2 rounded bg-acento/60"
-                  onClick={handleSell}
-                >
-                  Confirmar Venta
-                </button>
-                <button
-                  className="px-4 py-2 rounded bg-acento/60"
-                  onClick={handleNewClient}
-                >
-                  Nuevo cliente
-                </button>
-              </div>
-            </>
-          )}
-        </Box>
-      </Modal>
+
+      <ModalBox
+        modalState={{ isClientModalOpen, setIsClientModalOpen, isNewClientFormVisible, setIsNewClientFormVisible }}
+        clientData={{ newClient, clients }}
+        actions={{ handleInputChange, handleSaveClient, handleSelectClient, handleNewClient, handleSell }}
+      />
 
       {
         Object.keys(cart).length <= 0 ? (
           <p>No hay productos en el carrito</p>
         ) : <div id="printable-content">
           <header className='flex flex-row justify-between items-center my-2'>
-            <h2 className="text-xl font-bold">Presupuesto Artemisa</h2>
+            <h2 className="text-xl font-bold print:hidden">Presupuesto Artemisa</h2>
             <button
               className="print:hidden px-4 py-2 rounded bg-acento/60"
               onClick={() => setIsClientModalOpen(true)}
             >
-              Vender
+              Asignar Cliente
             </button>
           </header>
 
-
+          <BudgetHeader selectedClient={selectedClient} />
           <div className="grid gap-4">
             {Object.keys(cart).map((id) => (
               <div
@@ -560,7 +323,7 @@ const Presupuesto = () => {
                         desc.label === 'CANT. DE PIEZAS POR CAJA' ||
                         desc.label === 'PRESENTACIÓN'
                       ).map((desc) => (
-                        <span key={desc.label}>
+                        <span key={desc._id}>
                           {desc.label}: {desc.value} <br />
                         </span>
                       ))
@@ -591,32 +354,13 @@ const Presupuesto = () => {
                 <div className="flex flex-col items-center gap-2 md:items-end md:justify-end">
                   <div className="flex flex-row md:flex-col gap-2">
                     <div className="flex flex-row pr-2 md:p-0 md:gap-4 justify-between print:hidden">
-                      <label htmlFor="cantidad" className="self-center">Cant:</label>
-                      <input
-                        style={{
-                          MozAppearance: "textfield"
-                        }}
-                        type="number"
-                        className="w-16 md:w-20 h-10 px-2 border-none border-gray-300 rounded focus:outline-none"
-                        min={1}
-                        value={cart[id] || ""}
-                        onChange={(e) => handleCantidadChange(id, e.target.value)}
-                        onBlur={() => handleBlur(id)}
-                      />
+                      <InputField label="Cant" id={`cantidad-${id}`} value={cart[id] || ""} onChange={(e) => handleCantidadChange(id, e.target.value)} />
+
                     </div>
                     <div className="flex flex-row pr-2 md:p-0 md:gap-4 justify-between print:hidden">
-                      <label htmlFor={`ganancia-${id}`} className="self-center">Ganancia:</label>
                       <div className="relative w-full md:w-20 z-0">
-                        <input
-                          type="number"
-                          className="w-16 md:w-20 h-10 px-2 pr-6 border-none border-gray-300 rounded focus:outline-none"
-                          id={`ganancia-${id}`}
-                          min={0}
-                          max={100}
-                          value={ganancia[id] === undefined ? "" : ganancia[id]}
-                          onChange={(e) => handleGananciaChange(id, e.target.value)}
-                        />
-                        <span className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 z-0">%</span>
+                        <InputField label="Ganancia" id={`ganancia-${id}`} value={ganancia[id] || ""} onChange={(e) => handleGananciaChange(id, e.target.value)} min={0} max={100} />
+                        <span className="absolute right-5 md:-right-12 top-1/2 transform -translate-y-1/2 text-gray-500 z-0">%</span>
                       </div>
                     </div>
                     <p className="text-md font-medium text-left hidden print:block print:ml-auto text-nowrap">

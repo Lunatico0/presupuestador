@@ -107,8 +107,8 @@ const ProductCard = ({ product, quantity, onQuantityChange, onAddToCart, onQuant
 
       <div className="relative rounded-xl flex flex-col items-start justify-between min-h-96">
         <h2 className="text-lg block text-left font-semibold">{product.title}</h2>
-        {product.description.map((desc) => (
-          <p key={desc._id += 1} className="line-clamp-2">{desc.label}: {desc.value}</p>
+        {product.description.map((desc, index) => (
+          <p key={index} className="line-clamp-2">{desc.label}: {desc.value}</p>
         ))}
         <p className="mt-1 font-bold">{isPesos ? "ARS" : "USD"} ${transformedPrice}</p>
 

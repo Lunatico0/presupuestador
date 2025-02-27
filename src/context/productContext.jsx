@@ -11,7 +11,6 @@ export const ProductsProvider = ({ children }) => {
   const [fetchedIds, setFetchedIds] = useState(new Set());
   const [isPesos, setIsPesos] = useState(false);
   const [dollarRate, setDollarRate] = useState();
-  console.log(productDetails)
 
   const fetchProductById = async (id) => {
     if (!fetchedIds.has(id)) {
