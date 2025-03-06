@@ -1,0 +1,49 @@
+@media print {
+  /* Asegura que use una fuente clara y nítida */
+  body {
+    font-family: Arial, sans-serif;
+    font-size: 12pt;
+    color: black;
+    background: white !important;
+  }
+
+  /* Asegura que las imágenes se impriman en alta calidad */
+  img {
+    max-width: 100%;
+    height: auto;
+    image-rendering: crisp-edges; /* Mejora la nitidez */
+    print-color-adjust: exact; /* Mantiene los colores originales */
+    -webkit-print-color-adjust: exact;
+  }
+
+  /* Evita que el navegador reduzca la calidad del contenido */
+  * {
+    -webkit-filter: none !important;
+    filter: none !important;
+  }
+
+  /* Eliminar los márgenes y bordes en la impresión */
+  #printable-content {
+    width: 100%;
+    margin: 0;
+    padding: 20px;
+    border: none;
+    box-shadow: none;
+  }
+
+  /* Oculta botones y elementos innecesarios */
+  button, .print:hidden {
+    display: none !important;
+  }
+
+  /* Evita que los textos se corten en nuevas páginas */
+  h2, p {
+    page-break-inside: avoid;
+  }
+
+  /* Configuración para páginas A4 con márgenes adecuados */
+  @page {
+    size: A4;
+    margin: 1cm;
+  }
+}
