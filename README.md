@@ -67,29 +67,29 @@ This was a solo built project.
 ## 🏗️ System Architecture
 
 ┌───────────────────────────────────────────────────────────┐
-│ Client (React) │
-│ - Dashboards │
-│ - Product Manager (CRUD + images + specs) │
-│ - Quoting UI (dynamic form + pricing logic) │
-│ - Sales History + filters │
-│ - USD/ARS conversion tool │
+│ Client (React)                                            │
+│ - Dashboards                                              │
+│ - Product Manager (CRUD + images + specs)                 │
+│ - Quoting UI (dynamic form + pricing logic)               │
+│ - Sales History + filters                                 │
+│ - USD/ARS conversion tool                                 │
 └───────────────▲───────────────────────────────────────────┘
-│ REST API (JWT)
+│ REST API (JWT)                                            | 
 ┌───────────────┴───────────────────────────────────────────┐
-│ Node.js / Express │
-│ - Auth (JWT) │
-│ - Product CRUD │
-│ - Quoting + margin logic │
-│ - Sales records │
-│ - File uploads │
+│ Node.js / Express                                         │
+│ - Auth (JWT)                                              │
+│ - Product CRUD                                            │
+│ - Quoting + margin logic                                  │
+│ - Sales records                                           │
+│ - File uploads                                            │
 └───────────────▲───────────────────────────────────────────┘
-│ Mongoose
+│ Mongoose ORM                                              |
 ┌───────────────┴───────────────────────────────────────────┐
-│ MongoDB │
-│ - Products │
-│ - Quotes │
-│ - Sales │
-│ - Categories │
+│ MongoDB                                                   │
+│ - Products                                                │
+│ - Quotes                                                  │
+│ - Sales                                                   │
+│ - Categories                                              │
 └───────────────────────────────────────────────────────────┘
 
 
