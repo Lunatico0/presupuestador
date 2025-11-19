@@ -66,6 +66,7 @@ This was a solo built project.
 
 ## 🏗️ System Architecture
 
+```
 ┌───────────────────────────────────────────────────────────┐
 │ Client (React)                                            │
 │ - Dashboards                                              │
@@ -74,7 +75,7 @@ This was a solo built project.
 │ - Sales History + filters                                 │
 │ - USD/ARS conversion tool                                 │
 └───────────────▲───────────────────────────────────────────┘
-│ REST API (JWT)                                            | 
+                │ REST API (JWT)
 ┌───────────────┴───────────────────────────────────────────┐
 │ Node.js / Express                                         │
 │ - Auth (JWT)                                              │
@@ -83,7 +84,7 @@ This was a solo built project.
 │ - Sales records                                           │
 │ - File uploads                                            │
 └───────────────▲───────────────────────────────────────────┘
-│ Mongoose ORM                                              |
+                │ Mongoose ORM
 ┌───────────────┴───────────────────────────────────────────┐
 │ MongoDB                                                   │
 │ - Products                                                │
@@ -91,9 +92,8 @@ This was a solo built project.
 │ - Sales                                                   │
 │ - Categories                                              │
 └───────────────────────────────────────────────────────────┘
+```
 
-
----
 
 ## 🧩 Key Features
 
